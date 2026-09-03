@@ -1363,7 +1363,7 @@ document.addEventListener('DOMContentLoaded', applyThemeChrome);
   <section class="screen" id="s-slow-play">
     <div class="hud">
       <div class="hud-side">
-        <button class="icon-btn" id="slowQuitBtn" onclick="SlowRound.quitTap()" aria-label="Quit round">‹</button>
+        <button class="icon-btn" id="slowQuitBtn" onclick="SlowRound.quitTap()" aria-label="Leave - your progress is saved">‹</button>
         <span class="who" id="slowWho">Slow Cook</span>
         <button class="finish-chip" id="slowFinishBtn" style="display:none" onclick="SlowRound.finishNow()">Finish</button>
       </div>
@@ -3027,7 +3027,7 @@ const SlowRound = (function(){
     quitTap(){
       const b=$('slowQuitBtn');
       if(!quitArmed){
-        quitArmed=true; b.classList.add('armed'); b.textContent='Quit?';
+        quitArmed=true; b.classList.add('armed'); b.textContent='Leave?';
         quitTimer=setTimeout(resetQuitS, 2400);
         return;
       }
