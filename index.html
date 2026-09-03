@@ -1234,7 +1234,7 @@ document.addEventListener('DOMContentLoaded', applyThemeChrome);
         <text x="180" y="182" text-anchor="middle" dominant-baseline="central" font-family="Fredoka,'Trebuchet MS',sans-serif" font-weight="700" font-size="46" fill="#F6ECD6">BURGER</text>
         <rect x="14" y="222" width="332" height="40" rx="20" fill="#B8803C"/>
       </svg>
-      <p class="home-tag">Two letters. Sixty seconds. Stack every word that fits between the buns.</p>
+      <p class="home-tag" id="homeTag">Two letters. Sixty seconds. Stack every word that fits between the buns.</p>
     </div>
 
     <div class="daily" id="dailyCard"></div>
@@ -2230,6 +2230,13 @@ function renderHome(){
   const s=Store.get();
   const mode = s.dailyMode || 'classic';
   const dateLbl = new Date().toLocaleDateString(undefined,{weekday:'long', month:'short', day:'numeric'});
+
+  const homeTag=$('homeTag');
+  if(homeTag){
+    homeTag.textContent = mode==='classic'
+      ? 'Two letters. Sixty seconds. Stack every word that fits between the buns.'
+      : 'Two letters. One target. Stack every word that fits between the buns.';
+  }
 
   const toggleHtml = `
     <div class="seg mode-toggle" id="dailyModeToggle">
