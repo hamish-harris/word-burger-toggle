@@ -1943,6 +1943,15 @@ const Sound = (function(){
 /* ============================================================
    DAILY PUZZLE — derived from the date, identical for everyone
    ============================================================ */
+// One streak shared across the whole site - playing EITHER Classic or
+// Target on a given day keeps it alive, regardless of which mode.
+function recordPlayStreak(s, day){
+  if(s.playLastDay === day) return; // already counted today via the other mode
+  s.playStreak = (s.playLastDay === day-1) ? (s.playStreak||0)+1 : 1;
+  s.playBestStreak = Math.max(s.playBestStreak||0, s.playStreak);
+  s.playLastDay = day;
+}
+
 const Daily = (function(){
   function dayNumber(){
     const n=new Date();
@@ -2048,8 +2057,7 @@ const Daily = (function(){
     record(snap){
       const s=Store.get();
       if(s.today && s.today.day===snap.day) return;
-      s.streak = (s.lastDay === snap.day-1) ? (s.streak||0)+1 : 1;
-      s.bestStreak = Math.max(s.bestStreak||0, s.streak);
+      recordPlayStreak(s, snap.day);
       s.bestScore  = Math.max(s.bestScore||0, snap.score);
       s.diamonds   = (s.diamonds||0) + snap.words.filter(o=>o.tier===3).length;
       s.played     = (s.played||0)+1;
@@ -2246,10 +2254,10 @@ function renderHome(){
 
   if(mode==='classic'){
     const done = s.today && s.today.day===Daily.day;
-    const streaks = (s.streak||s.played) ? `
+    const streaks = (s.playStreak||s.played) ? `
       <div class="streaks">
-        <div class="s"><div class="n">🔥 ${s.streak||0}</div><div class="l">streak</div></div>
-        <div class="s"><div class="n">${s.bestStreak||0}</div><div class="l">best run</div></div>
+        <div class="s"><div class="n">🔥 ${s.playStreak||0}</div><div class="l">streak</div></div>
+        <div class="s"><div class="n">${s.playBestStreak||0}</div><div class="l">best run</div></div>
         <div class="s"><div class="n">${s.bestScore||0}</div><div class="l">best score</div></div>
         <div class="s"><div class="n">💎 ${s.diamonds||0}</div><div class="l">rare words</div></div>
       </div>` : '';
@@ -2281,10 +2289,10 @@ function renderHome(){
 
   } else {
     const done = s.slowToday && s.slowToday.day===SlowCook.day;
-    const streaks = (s.slowStreak||s.slowPlayed) ? `
+    const streaks = (s.playStreak||s.slowPlayed) ? `
       <div class="streaks">
-        <div class="s"><div class="n">🔥 ${s.slowStreak||0}</div><div class="l">streak</div></div>
-        <div class="s"><div class="n">${s.slowBestStreak||0}</div><div class="l">best run</div></div>
+        <div class="s"><div class="n">🔥 ${s.playStreak||0}</div><div class="l">streak</div></div>
+        <div class="s"><div class="n">${s.playBestStreak||0}</div><div class="l">best run</div></div>
         <div class="s"><div class="n">${s.slowBestScore||0}</div><div class="l">best score</div></div>
         <div class="s"><div class="n">💎 ${s.slowDiamonds||0}</div><div class="l">rare words</div></div>
       </div>` : '';
@@ -2672,8 +2680,7 @@ const SlowCook = (function(){
     record(snap){
       const s=Store.get();
       if(s.slowToday && s.slowToday.day===snap.day) return;
-      s.slowStreak = (s.slowLastDay === snap.day-1) ? (s.slowStreak||0)+1 : 1;
-      s.slowBestStreak = Math.max(s.slowBestStreak||0, s.slowStreak);
+      recordPlayStreak(s, snap.day);
       s.slowBestScore  = Math.max(s.slowBestScore||0, snap.score);
       s.slowDiamonds   = (s.slowDiamonds||0) + snap.words.filter(o=>o.tier===3).length;
       s.slowPlayed     = (s.slowPlayed||0)+1;
