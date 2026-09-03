@@ -1087,7 +1087,7 @@ body::before{
   font-family:var(--display); font-weight:700; font-size:15px; cursor:pointer;
   display:grid; place-items:center; box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
 }
-.theme-fab{right:calc(var(--pad-x) + 40px); font-size:14px}
+.theme-fab{left:var(--pad-x); right:auto; font-size:14px}
 
 .help-fab:active{transform:translateY(1px); color:var(--mustard)}
 
@@ -2270,9 +2270,7 @@ function renderHome(){
       Daily.startHomeRankPolling({day:s.today.day, score:s.today.score});
     }
 
-    $('pastWrap').innerHTML = History.has()
-      ? `<button class="btn ghost sm" onclick="History.open()">Past burgers</button>`
-      : '';
+    $('pastWrap').innerHTML = `<button class="btn ghost sm" onclick="History.open()">Past burgers</button>`;
 
   } else {
     const done = s.slowToday && s.slowToday.day===SlowCook.day;
@@ -2293,9 +2291,9 @@ function renderHome(){
       ${streaks}` : `
       <div class="eyebrow">${dateLbl}</div>
       <h2>Daily Burger #${SlowCook.day+1}</h2>
-      <div class="meta">No clock. Stack every word that fits until you reach today's target.</div>
+      <div class="meta">Same two buns for everyone today.<br>No clock — stack every word that fits to hit the target.</div>
       ${toggleHtml}
-      <button class="btn" onclick="SlowCook.play()">Order up</button>
+      <button class="btn" onclick="SlowCook.play()">Play today's burger</button>
       ${streaks}`;
 
     $('pastWrap').innerHTML = `<button class="btn ghost sm" onclick="SlowHistory.open()">Past burgers</button>`;
