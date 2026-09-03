@@ -1087,6 +1087,7 @@ body::before{
   font-family:var(--display); font-weight:700; font-size:15px; cursor:pointer;
   display:grid; place-items:center; box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
 }
+.theme-fab{right:calc(var(--pad-x) + 40px); font-size:14px}
 
 .help-fab:active{transform:translateY(1px); color:var(--mustard)}
 
@@ -1159,6 +1160,50 @@ body::before{
 .past-wrap .btn{width:100%}
 
 </style>
+<style id="light-theme">html.light{
+  --griddle:#33241a; --griddle-2:#efe3cb; --char:#f2e8d2;
+  --panel:#efe3cb; --panel-hi:#f6efe0; --panel-2:#f2e8d2;
+  --cream:#33241a; --steel:#6f5a44;
+  --mustard:#d99a2b; --mustard-hi:#e5b04a; --mustard-dk:#a06f10; --cheese:#d3921f;
+  --ketchup:#b23a24; --ketchup-hi:#c94a32;
+  --pickle:#8a9a4a;
+  --bun:#dfa963; --bun-hi:#ecc084; --bun-dk:#c98944; --bun-dk2:#b87838;
+  --patty:#6b4a2e; --patty-hi:#7d5636;
+  --line:rgba(51,36,26,.16); --line-hi:rgba(51,36,26,.3);
+  --glow:rgba(217,154,43,0);
+  --shadow-1:0 1px 2px rgba(51,36,26,.12); --shadow-2:0 6px 20px rgba(51,36,26,.14); --shadow-3:0 14px 40px rgba(51,36,26,.18);
+}html.light body{background:#f6efe0; color:#33241a}html.light body::before{background:repeating-linear-gradient(90deg, rgba(51,36,26,.035) 0 1px, transparent 1px 30px); mask-image:none}html.light #splash{background:#f6efe0}html.light .sp{filter:drop-shadow(0 8px 0 rgba(51,36,26,.14))}html.light .sp-top i, html.light .seed{background:#f6efe0; box-shadow:none}html.light .sp-top, html.light .sp-bot{box-shadow:none}html.light .sp-burger{color:#f6efe0}html.light .logo-svg{filter:drop-shadow(0 5px 0 rgba(51,36,26,.14))}html.light .btn{background:var(--ketchup); color:#f6efe0; box-shadow:0 4px 0 #33241a; border-radius:99px}html.light .btn:active{box-shadow:0 1px 0 #33241a}html.light .btn.ghost{background:#efe3cb; color:#33241a; box-shadow:0 4px 0 #d9c9ab; border:1px solid #d9c9ab}html.light .btn.ghost:active{box-shadow:0 1px 0 #d9c9ab}html.light .btn:focus-visible, html.light .icon-btn:focus-visible, html.light .chip-btn:focus-visible, html.light input:focus-visible{outline:3px solid #b23a24}html.light .daily{background:#fffbf0; border:2px solid #33241a; outline:1px solid #33241a; outline-offset:3px; box-shadow:none; margin-left:4px; margin-right:4px}html.light .streaks .s{background:rgba(51,36,26,.05); box-shadow:none; border:1px solid rgba(51,36,26,.12)}html.light .eyebrow{color:#b23a24}html.light .seg button.on{background:var(--mustard); color:#33241a; box-shadow:none; border-color:var(--mustard)}html.light .chip-btn{background:#efe3cb; color:#33241a; box-shadow:0 2px 0 #d9c9ab}html.light .icon-btn{background:#efe3cb; box-shadow:none}html.light .score{color:#a06f10; text-shadow:none}html.light .big-score{color:#b23a24; text-shadow:none}html.light .bun-card .big{color:#b23a24; text-shadow:none}html.light .timer .secs{color:#33241a}html.light .timer .secs.big{text-shadow:none}html.light .timer.low .secs{color:#b23a24}html.light .pass-countdown{text-shadow:none}html.light .track{background:#e8dcc0; border:1px solid #d9c9ab; box-shadow:inset 0 1px 3px rgba(51,36,26,.12)}html.light .track .mask{background:#e8dcc0; border-left:1px solid rgba(51,36,26,.15)}html.light .track .ticks{opacity:.35}html.light .track .knob{background:#33241a; box-shadow:0 0 0 2px #f6efe0}html.light .bar{background:#e8dcc0}html.light .progress .num b{color:#33241a}html.light .wordbox .ghost, html.light .wordbox .ghost-us{color:#a98d68}html.light .wordbox .caret{background:#b23a24}html.light .key{color:#33241a}html.light .key::before{background:#efe3cb; border-color:#d9c9ab; box-shadow:0 2px 0 #d9c9ab}html.light .key:active::before, html.light .key.popped::before{background:var(--mustard); box-shadow:0 0 0 #d9c9ab}html.light .key .pop{background:#33241a; color:#f6efe0; box-shadow:0 6px 16px rgba(51,36,26,.3)}html.light .key.act.popped{color:#f6efe0}html.light .key.go{color:#33241a}html.light .key.go.cold{filter:none; opacity:.45}html.light .layer{box-shadow:0 2px 0 rgba(51,36,26,.14)}html.light .ing1, html.light .ing3{color:#f6efe0}html.light .rare{background:rgba(51,36,26,.25); color:#f6efe0}html.light .b-bun .let{color:#5c3a17; text-shadow:none}html.light .toast{color:#f6efe0}html.light .share-box{background:#fffbf0; border:1px dashed #c9b592; color:#33241a}html.light .countdown b{color:#33241a}html.light .tile, html.light .row{background:#efe3cb; box-shadow:none}html.light .board .p{background:#efe3cb}html.light .board .p .s, html.light .board .p.now .s{color:#33241a}html.light .words .c{background:#efe3cb; border-color:#d9c9ab}html.light .words .c b{color:#a06f10}html.light .hx-item.open .hx-row{background:rgba(51,36,26,.06)}html.light #howto{background:rgba(51,36,26,.45)}html.light .howto-card{background:#fffbf0; box-shadow:0 14px 40px rgba(51,36,26,.2)}html.light .help-fab{background:#efe3cb; color:#9b7f5e; border-color:#d9c9ab; box-shadow:none}html.light #ppNames input{background:#fffdf6; color:#33241a; border:1px solid #d9c9ab; box-shadow:none}html.light .home-tag, html.light .sub, html.light .daily .meta, html.light .note{color:#6f5a44}html.light .who, html.light .timer .order{color:#6f5a44}html.light .tile .l, html.light .streaks .s .l, html.light .bun-card .cap{color:#84684a}html.light .rule{color:#84684a}html.light .countdown{color:#6f5a44}html.light .rank-badge{color:#6f5a44}html.light .progress .num{color:#6f5a44}html.light .hx-none, html.light .hx-empty{color:#6f5a44}html.light .label{color:#84684a}html.light .back{color:#6f5a44}html.light .big-score .u, html.light .score .u{color:#84684a}
+</style>
+<script>
+(function(){
+  try{
+    if(localStorage.getItem('wordburger.theme')==='light') document.documentElement.classList.add('light');
+  }catch(e){}
+})();
+function applyThemeChrome(){
+  const light=document.documentElement.classList.contains('light');
+  const tc=document.querySelector('meta[name="theme-color"]');
+  if(tc) tc.setAttribute('content', light?'#f6efe0':'#17120E');
+  const sb=document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
+  if(sb) sb.setAttribute('content', light?'default':'black');
+  const map={dark:{"#33241a":"#17120E","#f6efe0":"#F6ECD6","#d99a2b":"#F2A81D","#b23a24":"#C63D26","#dfa963":"#D89A4E","#c98944":"#B8803C"},
+             light:{"#17120E":"#33241a","#F6ECD6":"#f6efe0","#F2A81D":"#d99a2b","#C63D26":"#b23a24","#D89A4E":"#dfa963","#B8803C":"#c98944"}};
+  const m=light?map.light:map.dark;
+  document.querySelectorAll('.logo-svg [fill]').forEach(el=>{
+    const f=el.getAttribute('fill'); if(m[f]) el.setAttribute('fill', m[f]);
+  });
+  const tf=document.querySelector('.theme-fab');
+  if(tf) tf.textContent=light?'\u263E':'\u2600';
+}
+function toggleTheme(){
+  const el=document.documentElement;
+  el.classList.toggle('light');
+  try{ localStorage.setItem('wordburger.theme', el.classList.contains('light')?'light':'dark'); }catch(e){}
+  applyThemeChrome();
+}
+document.addEventListener('DOMContentLoaded', applyThemeChrome);
+</script>
+</head>
 </head>
 <body>
 <div id="app">
@@ -3208,6 +3253,12 @@ $('freeDiff').addEventListener('click', e=>{
     b.className='help-fab'; b.type='button'; b.textContent='?';
     b.setAttribute('aria-label','How to play');
     b.addEventListener('click', openHelp);
+    const t=document.createElement('button');
+    t.className='help-fab theme-fab'; t.type='button';
+    t.textContent=document.documentElement.classList.contains('light')?'\u263E':'\u2600';
+    t.setAttribute('aria-label','Switch light or dark');
+    t.addEventListener('click', toggleTheme);
+    s.appendChild(t);
     s.appendChild(b);
   }
   addFab('s-home');
