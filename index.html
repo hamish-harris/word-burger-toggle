@@ -1278,7 +1278,7 @@ document.addEventListener('DOMContentLoaded', applyThemeChrome);
         <rect x="14" y="222" width="332" height="40" rx="20" fill="#B8803C"/>
       </svg>
       <p class="home-tag" id="homeTag">Two letters. Sixty seconds. Stack every word that fits between the buns.</p>
-      <button class="username-chip" id="usernameChip" onclick="Username.openModal()">Player <span class="edit-ic">✎</span></button>
+      <button class="username-chip" id="usernameChip" style="visibility:hidden" onclick="Username.openModal()"><span class="edit-ic">✎</span></button>
     </div>
 
     <div class="daily" id="dailyCard"></div>
@@ -1676,7 +1676,10 @@ const Username = (function(){
   }
   function render(){
     const chip = $('usernameChip');
-    if(chip && current) chip.innerHTML = esc(current)+' <span class="edit-ic">✎</span>';
+    if(chip && current){
+      chip.innerHTML = esc(current)+' <span class="edit-ic">✎</span>';
+      chip.style.visibility = 'visible';
+    }
   }
   function openModal(){
     const input=$('usernameInput');
@@ -2370,14 +2373,14 @@ function renderHome(){
       <h2>Today's burger is stacked</h2>
       <div class="meta">Burger #${Daily.day+1} · you scored ${s.today.score}</div>
       <div class="rank-badge" id="homeRank" style="display:none; cursor:pointer" onclick="Leaderboard.open(Daily.day, 'Classic')"><span class="live-dot"></span>Ranked <b>#<span id="homeRankNum">-</span></b> today ›</div>
-      ${toggleHtml}
       <button class="btn" onclick="Daily.showResult()">See result and share</button>
+      ${toggleHtml}
       ${streaks}` : `
       <div class="eyebrow">${dateLbl}</div>
       <h2>Daily Burger #${Daily.day+1}</h2>
       <div class="meta">Same two buns for everyone today.<br>One 60-second go. Longer and rarer words score more.</div>
-      ${toggleHtml}
       <button class="btn" onclick="Daily.play()">Play today's burger</button>
+      ${toggleHtml}
       ${streaks}`;
 
     if(done){
@@ -2405,14 +2408,14 @@ function renderHome(){
       <h2>Today's burger is stacked</h2>
       <div class="meta">Burger #${SlowCook.day+1} · you scored ${s.slowToday.score}</div>
       <div class="rank-badge" id="slowHomeRank" style="display:none; cursor:pointer" onclick="Leaderboard.open(SlowCook.day+SLOW_DAY_OFFSET, 'Target')"><span class="live-dot"></span>Ranked <b>#<span id="slowHomeRankNum">-</span></b> today ›</div>
-      ${toggleHtml}
       <button class="btn" onclick="SlowCook.showResult()">See result and share</button>
+      ${toggleHtml}
       ${streaks}` : `
       <div class="eyebrow">${dateLbl}</div>
       <h2>Daily Burger #${SlowCook.day+1}</h2>
       <div class="meta">Same two buns for everyone today.<br>No clock — stack every word that fits to hit the target.</div>
-      ${toggleHtml}
       <button class="btn" onclick="SlowCook.play()">Play today's burger</button>
+      ${toggleHtml}
       ${streaks}`;
 
     if(done){
