@@ -1256,7 +1256,10 @@ document.addEventListener('DOMContentLoaded', applyThemeChrome);
     <div class="howto-card" style="max-width:340px">
       <h3>Choose a username</h3>
       <p class="lead">This is how you'll appear on the daily leaderboard.</p>
-      <input type="text" id="usernameInput" maxlength="24" placeholder="e.g. BunMaster" autocomplete="off">
+      <div style="position:relative">
+        <input type="text" id="usernameInput" maxlength="24" placeholder="e.g. BunMaster" autocomplete="off" style="padding-right:44px">
+        <button type="button" class="wb-clear" id="usernameClearBtn" style="display:none" onclick="Username.clearInput()" aria-label="Clear">×</button>
+      </div>
       <div id="usernameError"></div>
       <button class="btn" onclick="Username.save()" style="margin-top:14px">Save</button>
       <button class="btn ghost sm" onclick="Username.closeModal()" style="margin-top:8px">Cancel</button>
@@ -1681,15 +1684,27 @@ const Username = (function(){
       chip.style.visibility = 'visible';
     }
   }
+  function updateClearBtn(){
+    const input=$('usernameInput'), btn=$('usernameClearBtn');
+    if(btn) btn.style.display = input.value ? '' : 'none';
+  }
   function openModal(){
     const input=$('usernameInput');
     input.value = current || '';
     $('usernameError').textContent = '';
     $('usernameModal').classList.add('on');
+    updateClearBtn();
+    input.oninput = updateClearBtn;
     setTimeout(()=>input.focus(), 50);
   }
   function closeModal(){
     $('usernameModal').classList.remove('on');
+  }
+  function clearInput(){
+    const input=$('usernameInput');
+    input.value = '';
+    updateClearBtn();
+    input.focus();
   }
   async function save(){
     const val = $('usernameInput').value.trim();
@@ -1717,7 +1732,7 @@ const Username = (function(){
       errEl.textContent = 'Network error. Try again.';
     }
   }
-  return { init, openModal, closeModal, save };
+  return { init, openModal, closeModal, save, clearInput };
 })();
 
 const Leaderboard = (function(){
