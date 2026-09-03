@@ -2293,6 +2293,7 @@ function renderHome(){
       <div class="eyebrow">${dateLbl}</div>
       <h2>Today's burger is stacked</h2>
       <div class="meta">Burger #${SlowCook.day+1} · you scored ${s.slowToday.score}</div>
+      <div class="rank-badge" id="slowHomeRank" style="display:none"><span class="live-dot"></span>Ranked <b>#<span id="slowHomeRankNum">-</span></b> today</div>
       ${toggleHtml}
       <button class="btn" onclick="SlowCook.showResult()">See result and share</button>
       ${streaks}` : `
@@ -2302,6 +2303,14 @@ function renderHome(){
       ${toggleHtml}
       <button class="btn" onclick="SlowCook.play()">Play today's burger</button>
       ${streaks}`;
+
+    if(done){
+      const cachedRank = (s.slowRankByDay||{})[s.slowToday.day];
+      const hRankEl=$('slowHomeRank'), hNumEl=$('slowHomeRankNum');
+      if(cachedRank && hRankEl && hNumEl){ hNumEl.textContent=cachedRank; hRankEl.style.display=''; }
+      SlowCook.checkRank(s.slowToday.day, s.slowToday.score);
+      SlowCook.startHomeRankPolling({day:s.slowToday.day, score:s.slowToday.score});
+    }
 
     $('pastWrap').innerHTML = `<button class="btn ghost sm" onclick="SlowHistory.open()">Past burgers</button>`;
   }
@@ -2582,15 +2591,83 @@ const SlowCook = (function(){
   }
   let cd=null;
 
+  // Target's scores aren't comparable to Classic's (different scoring shape
+  // entirely), so they're submitted under a shifted "day" number - keeps
+  // them in a completely separate ranking pool on the same leaderboard.
+  const SLOW_DAY_OFFSET = 1000000;
+  let slowResultRankPoll=null, slowHomeRankPoll=null;
+
+  function applySlowRank(day, rank){
+    const s=Store.get();
+    s.slowRankByDay = s.slowRankByDay || {};
+    s.slowRankByDay[day] = rank;
+    Store.set(s);
+    const srRankEl=$('srRank'), srNumEl=$('srRankNum');
+    if(srRankEl && srNumEl && s.slowToday && s.slowToday.day===day){
+      srNumEl.textContent = rank; srRankEl.style.display = '';
+    }
+    const hRankEl=$('slowHomeRank'), hNumEl=$('slowHomeRankNum');
+    if(hRankEl && hNumEl && s.slowToday && s.slowToday.day===day){
+      hNumEl.textContent = rank; hRankEl.style.display = '';
+    }
+  }
+  function submitSlowRank(snap){
+    if(!LEADERBOARD_URL) return;
+    fetch(LEADERBOARD_URL+'/submit', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ day: snap.day+SLOW_DAY_OFFSET, score: snap.score, deviceId: visitorId() })
+    }).then(r=>r.ok ? r.json() : null).then(data=>{
+      if(data && typeof data.rank==='number') applySlowRank(snap.day, data.rank);
+    }).catch(()=>{});
+  }
+  function checkSlowRank(day, score){
+    if(!LEADERBOARD_URL) return;
+    fetch(LEADERBOARD_URL+'/rank?day='+encodeURIComponent(day+SLOW_DAY_OFFSET)+'&score='+encodeURIComponent(score))
+      .then(r=>r.ok ? r.json() : null).then(data=>{
+        if(data && typeof data.rank==='number') applySlowRank(day, data.rank);
+      }).catch(()=>{});
+  }
+  function startSlowRankPolling(snap){
+    clearInterval(slowResultRankPoll);
+    if(!LEADERBOARD_URL) return;
+    slowResultRankPoll=setInterval(()=>{
+      const scr=$('s-slow-res');
+      if(!scr || !scr.classList.contains('on')){ clearInterval(slowResultRankPoll); return; }
+      if(document.hidden) return;
+      checkSlowRank(snap.day, snap.score);
+    }, 20000);
+  }
+  function startSlowHomeRankPolling(snap){
+    clearInterval(slowHomeRankPoll);
+    if(!LEADERBOARD_URL) return;
+    slowHomeRankPoll=setInterval(()=>{
+      const scr=$('s-home');
+      if(!scr || !scr.classList.contains('on')){ clearInterval(slowHomeRankPoll); return; }
+      if(document.hidden) return;
+      checkSlowRank(snap.day, snap.score);
+    }, 20000);
+  }
+
   return {
     day:0, start:'A', end:'D',
+    checkRank: checkSlowRank,
+    startHomeRankPolling: startSlowHomeRankPolling,
     refresh(){ this.day=dayNumber(); const p=pairFor(this.day); this.start=p[0]; this.end=p[1]; },
     play(){
       const s=Store.get();
       if(s.slowToday && s.slowToday.day===this.day){ renderHome(); go('s-home'); return; }
       Sound.ensure();
+      const label='Slow Cook #'+(this.day+1);
+      const saved = s.slowInProgress;
+      if(saved && saved.day===this.day){
+        track('slowcook_resume', { puzzle:this.day+1 });
+        SlowRound.resume(saved, label);
+        return;
+      }
+      if(saved){ delete s.slowInProgress; Store.set(s); } // stale, different day
       track('slowcook_start', { puzzle:this.day+1 });
-      SlowRound.begin({ start:this.start, end:this.end, label:'Slow Cook #'+(this.day+1) });
+      SlowRound.begin({ start:this.start, end:this.end, label });
     },
     record(snap){
       const s=Store.get();
@@ -2608,6 +2685,7 @@ const SlowCook = (function(){
         words:snap.words.map(o=>({w:o.w, pts:o.pts, tier:o.tier}))
       }]).slice(-150);
       Store.set(s);
+      submitSlowRank(snap);
     },
     showResult(){
       const s=Store.get(), snap=s.slowToday;
@@ -2624,7 +2702,13 @@ const SlowCook = (function(){
       $('srTime').textContent = timeText(snap.secs||0);
       $('srDiamonds').textContent = '💎 '+snap.words.filter(o=>o.tier===3).length;
       $('srShareBox').textContent = SlowShare.text(snap);
-      $('srRank').style.display='none';
+
+      const srRankEl=$('srRank'), srNumEl=$('srRankNum');
+      if(srRankEl && srNumEl){
+        const cachedRank = (s.slowRankByDay||{})[snap.day];
+        if(cachedRank){ srNumEl.textContent=cachedRank; srRankEl.style.display=''; }
+        else { srRankEl.style.display='none'; }
+      }
 
       const g=$('srWords'); g.innerHTML=''; g.style.display='none';
       $('srRevealBtn').textContent='Show my words';
@@ -2635,6 +2719,8 @@ const SlowCook = (function(){
       });
 
       go('s-slow-res');
+      checkSlowRank(snap.day, snap.score);
+      startSlowRankPolling(snap);
       clearInterval(cd);
       const tick=()=>{
         const now=new Date();
@@ -2688,9 +2774,33 @@ const SlowRound = (function(){
     finishArmed=false; clearTimeout(finishTimer);
     const b=$('slowQuitBtn'); if(b){ b.textContent='‹'; b.classList.remove('armed'); }
   }
+  // persists mid-round progress so leaving and coming back (same day)
+  // picks up exactly where you left off
+  function saveProgress(){
+    if(!st) return;
+    const s=Store.get();
+    s.slowInProgress = {
+      day: SlowCook.day, start:st.start, end:st.end,
+      words: st.words.slice(), score: st.score, target: st.target,
+      startedAt: st.startedAt
+    };
+    Store.set(s);
+  }
+  function clearProgress(){
+    const s=Store.get();
+    if(s.slowInProgress){ delete s.slowInProgress; Store.set(s); }
+  }
+  function startTimer(){
+    clearInterval(timer);
+    timer=setInterval(()=>{
+      st.elapsed=(Date.now()-st.startedAt)/1000;
+      paintTimer('slow', st.words.length/st.target, clockText(Math.floor(st.elapsed)), false);
+    }, 250);
+  }
   function finish(){
     clearInterval(timer);
     st.running=false;
+    clearProgress();
     const snap={ day:SlowCook.day, score:st.score, words:st.words.slice(), start:st.start, end:st.end, secs:Math.round(st.elapsed||0), target:st.target };
     track('slowcook_complete', { puzzle:snap.day+1, score:snap.score, words:snap.words.length });
     SlowCook.record(snap); SlowCook.showResult();
@@ -2701,7 +2811,7 @@ const SlowRound = (function(){
       st = {
         start:cfg.start, end:cfg.end,
         used:new Set(), words:[], score:0, running:true, buf:'', invalid:false,
-        target: targetFor(cfg.start, cfg.end), elapsed:0
+        target: targetFor(cfg.start, cfg.end), elapsed:0, startedAt: Date.now()
       };
       $('slowWho').textContent = cfg.label;
       $('slowBunTopL').textContent = st.start;
@@ -2718,13 +2828,36 @@ const SlowRound = (function(){
       go('s-slow-play');
       paintBox('slowBox', st.buf, st.start, st.end, st.invalid, 'SlowRound.clear()');
       goHint('', st.start, st.end);
+      saveProgress();
+      startTimer();
+    },
+    // continues an in-progress round from where it was left, with the
+    // elapsed-time display counting from the ORIGINAL start, not resetting
+    resume(saved, label){
+      st = {
+        start:saved.start, end:saved.end,
+        used:new Set(saved.words.map(o=>o.w)), words:saved.words.slice(),
+        score:saved.score, running:true, buf:'', invalid:false,
+        target:saved.target, elapsed:(Date.now()-saved.startedAt)/1000,
+        startedAt:saved.startedAt
+      };
+      $('slowWho').textContent = label;
+      $('slowBunTopL').textContent = st.start;
+      $('slowBunBotL').textContent = st.end;
+      $('slowOrder').textContent = st.start+' → '+st.end;
+      $('slowFills').innerHTML = '';
+      st.words.forEach(o=>addLayerS(o.w, o.pts, o.tier));
+      if(!st.words.length) $('slowFills').innerHTML = '<div class="hint">Buns are ready. Start stacking.</div>';
+      paintScoreS();
+      $('slowTotalN').textContent = st.target;
+      paintProgressS();
+      paintTimer('slow', st.words.length/st.target, clockText(Math.floor(st.elapsed)), false);
+      resetQuitS();
 
-      clearInterval(timer);
-      const t0=Date.now();
-      timer=setInterval(()=>{
-        st.elapsed=(Date.now()-t0)/1000;
-        paintTimer('slow', st.words.length/st.target, clockText(Math.floor(st.elapsed)), false);
-      }, 250);
+      go('s-slow-play');
+      paintBox('slowBox', st.buf, st.start, st.end, st.invalid, 'SlowRound.clear()');
+      goHint('', st.start, st.end);
+      startTimer();
     },
     key(ch){
       if(!st || !st.running) return;
@@ -2756,6 +2889,7 @@ const SlowRound = (function(){
       st.score+=pts;
       addLayerS(w, pts, r.tier);
       paintScoreS(); paintProgressS();
+      saveProgress();
       if(st.words.length>=st.target){
         st.running=false;
         Sound.bell(3,.72); buzz([70,60,70,60,120]);
