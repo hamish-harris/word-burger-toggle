@@ -1269,7 +1269,7 @@ document.addEventListener('DOMContentLoaded', applyThemeChrome);
   <!-- HOME -->
   <section class="screen" id="s-home">
     <div class="home-top">
-      <svg class="logo-svg" viewBox="0 0 360 262" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Word Burger">
+      <svg class="logo-svg" viewBox="0 0 360 262" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Word Burger" onclick="go('s-home')" style="cursor:pointer">
         <rect x="14" y="6" width="332" height="52" rx="26" fill="#D89A4E"/>
         <ellipse cx="122" cy="30" rx="12" ry="6" fill="#F6ECD6"/>
         <ellipse cx="180" cy="24" rx="12" ry="6" fill="#F6ECD6"/>
@@ -1437,6 +1437,9 @@ document.addEventListener('DOMContentLoaded', applyThemeChrome);
 
   <!-- DAILY RESULT -->
   <section class="screen" id="s-daily-res">
+    <div class="head">
+      <button class="back" onclick="go('s-home')">‹ Home</button>
+    </div>
     <div class="res-head">
       <div class="eyebrow" id="drKicker">Word Burger #1</div>
       <h2 id="drTitle">Nice stack</h2>
