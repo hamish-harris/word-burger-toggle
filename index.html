@@ -1487,6 +1487,10 @@ document.addEventListener('DOMContentLoaded', applyThemeChrome);
       <h2 id="lbTitle">Today's Leaderboard</h2>
     </div>
     <p class="sub" id="lbSub">See how you stack up against everyone else today.</p>
+    <div class="seg" id="lbPeriodToggle" style="margin-bottom:var(--s4)">
+      <button data-period="day" class="on">Daily</button>
+      <button data-period="week">Weekly</button>
+    </div>
     <div class="lb-list" id="lbList"></div>
   </section>
 
@@ -1740,6 +1744,8 @@ const Username = (function(){
 })();
 
 const Leaderboard = (function(){
+  let curDay = 0, curLabel = '', curPeriod = 'day';
+
   function rowHtml(e){
     return '<div class="lb-row'+(e.isYou?' you':'')+'">'
       + '<span class="rk">#'+e.rank+'</span>'
@@ -1747,27 +1753,49 @@ const Leaderboard = (function(){
       + '<span class="sc">'+e.score+'</span>'
       + '</div>';
   }
+  async function load(){
+    $('lbSub').textContent = curPeriod==='week'
+      ? "Total points over the last 7 days."
+      : "See how you stack up against everyone else today.";
+    $('lbList').innerHTML = '<div class="lb-empty">Loading…</div>';
+    if(!LEADERBOARD_URL) return;
+    try{
+      const r = await fetch(LEADERBOARD_URL+'/leaderboard?day='+encodeURIComponent(curDay)
+        +'&period='+encodeURIComponent(curPeriod)+'&limit=50&deviceId='+encodeURIComponent(visitorId()));
+      const data = await r.json();
+      const entries = (data && data.entries) || [];
+      $('lbList').innerHTML = entries.length
+        ? entries.map(rowHtml).join('')
+        : (curPeriod==='week'
+            ? '<div class="lb-empty">No scores yet this week. Be the first!</div>'
+            : '<div class="lb-empty">No scores yet today. Be the first!</div>');
+    }catch(e){
+      $('lbList').innerHTML = '<div class="lb-empty">Couldn\'t load the leaderboard right now.</div>';
+    }
+  }
   return {
     async open(day, label){
+      curDay = day; curLabel = label; curPeriod = 'day';
       $('lbTitle').textContent = label;
-      $('lbSub').textContent = "See how you stack up against everyone else today.";
-      $('lbList').innerHTML = '<div class="lb-empty">Loading…</div>';
+      document.querySelectorAll('#lbPeriodToggle button').forEach(b=>b.classList.toggle('on', b.dataset.period==='day'));
       go('s-leaderboard');
-      if(!LEADERBOARD_URL) return;
-      try{
-        const r = await fetch(LEADERBOARD_URL+'/leaderboard?day='+encodeURIComponent(day)+'&limit=50&deviceId='+encodeURIComponent(visitorId()));
-        const data = await r.json();
-        const entries = (data && data.entries) || [];
-        $('lbList').innerHTML = entries.length
-          ? entries.map(rowHtml).join('')
-          : '<div class="lb-empty">No scores yet today. Be the first!</div>';
-      }catch(e){
-        $('lbList').innerHTML = '<div class="lb-empty">Couldn\'t load the leaderboard right now.</div>';
-      }
+      await load();
+    },
+    setPeriod(period){
+      curPeriod = period;
+      load();
     },
     close(){ go('s-home'); }
   };
 })();
+
+document.addEventListener('click', function(e){
+  const b = e.target.closest('#lbPeriodToggle button');
+  if(!b) return;
+  document.querySelectorAll('#lbPeriodToggle button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');
+  Leaderboard.setPeriod(b.dataset.period);
+});
 
 (function analytics(){
   if(!UMAMI_ID) return;
