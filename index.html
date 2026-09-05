@@ -1401,14 +1401,14 @@ function systemPrefersDark(){
 }
 function applyThemeClass(){
   let pref; try{ pref = localStorage.getItem('wordburger.theme'); }catch(e){ pref = null; }
-  const wantLight = pref==='dark' ? false : pref==='system' ? !systemPrefersDark() : true; // default: light
+  const wantLight = pref==='dark' ? false : pref==='light' ? true : !systemPrefersDark(); // default (no saved pref, or 'system'): follow OS
   document.documentElement.classList.toggle('light', wantLight);
 }
 applyThemeClass();
 try{
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(){
     let pref; try{ pref = localStorage.getItem('wordburger.theme'); }catch(e){ pref = null; }
-    if(pref==='system'){ applyThemeClass(); applyThemeChrome(); }
+    if(pref==='system' || !pref){ applyThemeClass(); applyThemeChrome(); }
   });
 }catch(e){}
 function applyThemeChrome(){
@@ -2854,7 +2854,7 @@ function renderHome(){
 }
 
 function renderAppearance(){
-  let pref; try{ pref = localStorage.getItem('wordburger.theme') || 'light'; }catch(e){ pref = 'light'; }
+  let pref; try{ pref = localStorage.getItem('wordburger.theme') || 'system'; }catch(e){ pref = 'system'; }
   document.querySelectorAll('.appear-row').forEach(r=>{
     r.classList.toggle('on', r.dataset.mode===pref);
   });
