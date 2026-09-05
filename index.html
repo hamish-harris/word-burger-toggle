@@ -1282,6 +1282,17 @@ body::before{ content:none; display:none; }
 .past-wrap:not(:empty){margin-top:var(--s3)}
 .past-wrap .btn{width:100%}
 
+
+/* free play difficulty: a chef's-hat rating filling the middle of the screen */
+.diff-stage{flex:1; min-height:0; display:flex; flex-direction:column; align-items:center;
+  justify-content:center; padding:var(--s5) 0 var(--s4)}
+.diff-hats{display:flex; gap:14px; align-items:flex-end}
+.diff-hats .slot{width:48px; height:56px; color:var(--cream); transition:opacity .22s ease, transform .22s ease}
+.diff-hats .slot svg{width:100%; height:100%; display:block}
+.diff-hats .slot.off{opacity:.14; transform:scale(.9)}
+.diff-cap{margin-top:var(--s4); text-align:center}
+.diff-cap .nm{font-family:var(--display); font-weight:800; font-size:19px; color:var(--cream)}
+.diff-cap .sb{font-size:12.5px; color:var(--steel); margin-top:5px; line-height:1.5; max-width:290px}
 </style>
 <style id="light-theme">html.light{
   --griddle:#2E241A; --griddle-2:#FBF6EA; --char:#F2E9D8;
@@ -1385,16 +1396,6 @@ html.light #usernameModal{background:rgba(46,36,26,.4)}
 html.light #usernameInput{background:#FFFDF7; color:#2E241A; border:1px solid #D8CEC0}
 html.light #usernameInput:focus{border-color:#D94A32}
 
-/* free play difficulty: a chef's-hat rating filling the middle of the screen */
-.diff-stage{flex:1; min-height:0; display:flex; flex-direction:column; align-items:center;
-  justify-content:center; padding:var(--s5) 0 var(--s4)}
-.diff-hats{display:flex; gap:14px; align-items:flex-end}
-.diff-hats .slot{width:48px; height:56px; color:var(--cream); transition:opacity .22s ease, transform .22s ease}
-.diff-hats .slot svg{width:100%; height:100%; display:block}
-.diff-hats .slot.off{opacity:.14; transform:scale(.9)}
-.diff-cap{margin-top:var(--s4); text-align:center}
-.diff-cap .nm{font-family:var(--display); font-weight:800; font-size:19px; color:var(--cream)}
-.diff-cap .sb{font-size:12.5px; color:var(--steel); margin-top:5px; line-height:1.5; max-width:290px}
 </style>
 <script>
 function systemPrefersDark(){
