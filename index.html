@@ -1479,7 +1479,7 @@ document.addEventListener('DOMContentLoaded', applyThemeChrome);
   <section class="screen" id="s-home">
     <div class="home-top">
       <svg class="logo-svg wb-logo" viewBox="0 0 800 618" role="img" aria-label="Word Burger" onclick="go('s-home')" style="cursor:pointer"><use href="#wb-logo"/></svg>
-      <p class="home-tag" id="homeTag">Two letters. Sixty seconds. Good words. Taste better.</p>
+      <p class="home-tag" id="homeTag">Two letters. Sixty seconds. Stack every word that fits between the buns.</p>
     </div>
 
     <div class="daily" id="dailyCard"></div>
@@ -2767,8 +2767,8 @@ function renderHome(){
   const homeTag=$('homeTag');
   if(homeTag){
     homeTag.textContent = mode==='classic'
-      ? 'Two letters. Sixty seconds. Good words. Taste better.'
-      : 'Two letters. One target. Good words. Taste better.';
+      ? 'Two letters. Sixty seconds. Stack every word that fits between the buns.'
+      : 'Two letters. One target. Stack every word that fits between the buns.';
   }
 
   const toggleHtml = `
