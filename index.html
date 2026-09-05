@@ -678,6 +678,10 @@ body::before{ content:none; display:none; }
    HOME
    ============================================================ */
 .logo-svg{width:min(190px,50vw); height:auto; display:block; margin:0 auto; animation:logoFloat 5s ease-in-out infinite}
+.dark-logo{display:block}
+.light-logo{display:none}
+html.light .dark-logo{display:none}
+html.light .light-logo{display:block}
 
 .home-top{padding-top:calc(var(--pad-t) + 44px)}
 
@@ -1427,7 +1431,8 @@ document.addEventListener('DOMContentLoaded', applyThemeChrome);
   <!-- SPLASH -->
   <div id="splash">
     <div class="sp" id="sp">
-      <img src="/assets/word-burger-logo-final.png" alt="Word Burger" width="800" height="618" style="width:100%; height:auto; display:block">
+      <img src="/assets/word-burger-logo-final.png" alt="Word Burger" width="800" height="618" class="light-logo" style="width:100%; height:auto">
+      <img src="/assets/word-burger-logo-dark-final.png" alt="Word Burger" width="800" height="618" class="dark-logo" style="width:100%; height:auto">
     </div>
   </div>
 
@@ -1446,7 +1451,8 @@ document.addEventListener('DOMContentLoaded', applyThemeChrome);
   <!-- HOME -->
   <section class="screen" id="s-home">
     <div class="home-top">
-      <img class="logo-svg" src="/assets/word-burger-logo-final.png" alt="Word Burger" width="800" height="618" onclick="go('s-home')" style="cursor:pointer">
+      <img class="logo-svg light-logo" src="/assets/word-burger-logo-final.png" alt="Word Burger" width="800" height="618" onclick="go('s-home')" style="cursor:pointer">
+      <img class="logo-svg dark-logo" src="/assets/word-burger-logo-dark-final.png" alt="Word Burger" width="800" height="618" onclick="go('s-home')" style="cursor:pointer">
       <p class="home-tag" id="homeTag">Two letters. Sixty seconds. Good words. Taste better.</p>
     </div>
 
