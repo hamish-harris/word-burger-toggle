@@ -274,13 +274,13 @@ body.locked #app{height:100%}
 .wb-clear{
   position:absolute; right:8px; top:50%; transform:translateY(-50%);
   width:28px; height:28px; border-radius:50%; border:none;
-  background:rgba(246,236,214,.14); color:var(--cream);
+  background:var(--ketchup); color:var(--cream);
   font-family:var(--ui); font-size:17px; font-weight:700; line-height:1;
   display:grid; place-items:center; cursor:pointer;
   box-shadow:0 2px 0 rgba(0,0,0,.3);
   animation:clearPop .18s cubic-bezier(.3,1.4,.5,1) both;
 }
-.wb-clear.bad{background:var(--ketchup)}
+.wb-clear.bad{background:var(--ketchup-hi,#D9502F)}
 .wb-clear:active{transform:translateY(-50%) scale(.92)}
 @keyframes clearPop{from{opacity:0; transform:translateY(-50%) scale(.6)}to{opacity:1; transform:translateY(-50%) scale(1)}}
 .wordbox .ghost{color:#5B4F42; opacity:.55}
@@ -339,8 +339,8 @@ body.locked #app{height:100%}
 .go::before{transition:background .16s ease, border-color .16s ease}
 .key.go::before{background:var(--go); border-color:var(--go); box-shadow:none}
 .key.go.popped::before{box-shadow:0 0 0}
-.key.go.cold::before{background:var(--panel-hi); border-color:var(--line)}
-.go.cold{color:var(--steel)}
+.key.go.cold::before{background:var(--mustard); border-color:var(--mustard)}
+.go.cold{color:#2A1A06}
 .krow .spacer{flex:0 0 var(--kw); visibility:hidden}
 .krow.krow-last{margin-top:1px}
 .key:disabled{opacity:.3; pointer-events:none}
