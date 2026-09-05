@@ -1293,6 +1293,18 @@ body::before{ content:none; display:none; }
 .diff-cap{margin-top:var(--s4); text-align:center}
 .diff-cap .nm{font-family:var(--display); font-weight:800; font-size:19px; color:var(--cream)}
 .diff-cap .sb{font-size:12.5px; color:var(--steel); margin-top:5px; line-height:1.5; max-width:290px}
+
+/* beta: flag words the dictionary turned away */
+.flagbox{margin:var(--s3) 0; text-align:left; background:var(--panel-2);
+  border:1px solid var(--line); border-radius:14px; padding:12px 13px}
+.flagbox .fcap{font-size:11.5px; color:var(--steel); line-height:1.5; margin-bottom:9px}
+.flagbox .fcap b{color:var(--cream)}
+.flagchips{display:flex; flex-wrap:wrap; gap:6px}
+.flagchip{border:1px solid var(--line-hi); background:var(--panel); color:var(--cream); cursor:pointer;
+  border-radius:99px; padding:7px 12px; font-family:var(--ui); font-weight:600; font-size:12.5px}
+.flagchip small{color:var(--mustard); margin-left:6px; font-weight:700}
+.flagchip.sent{opacity:.5; pointer-events:none}
+.flagchip.sent small{color:var(--pickle)}
 </style>
 <style id="atomic-icons">
 .at-ic{width:1.05em;height:1.05em;display:inline-block;vertical-align:-0.14em;margin-right:2px}
@@ -1711,6 +1723,7 @@ document.addEventListener('DOMContentLoaded', applyThemeChrome);
       <span class="rlb-left rlb-trophy">#<b id="srRankNum">-</b> today</span>
       <span class="rlb-right rlb-view">View leaderboard</span>
     </button>
+    <div id="srFlags"></div>
     <div class="share-box" id="srShareBox"></div>
     <button class="btn" id="srShareBtn" onclick="SlowShare.send()">Share result</button>
     <div class="countdown" id="srCountdown">Next burger in <b>--:--:--</b></div>
@@ -1741,6 +1754,7 @@ document.addEventListener('DOMContentLoaded', applyThemeChrome);
       <span class="rlb-left rlb-trophy">#<b id="drRankNum">-</b> today</span>
       <span class="rlb-right rlb-view">View leaderboard</span>
     </button>
+    <div id="drFlags"></div>
     <div class="share-box" id="shareBox"></div>
     <button class="btn" id="shareBtn" onclick="Share.send()">Share result</button>
     <div class="countdown" id="countdown">Next burger in <b>--:--:--</b></div>
@@ -2345,6 +2359,40 @@ function clockText(t){ const m=Math.floor(t/60), s=Math.floor(t%60); return m+':
 function esc(s){ return String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 
 /* validate a submission. returns {ok, tier} or {ok:false, msg} */
+
+/* ---- beta word flagging: players report words the dictionary rejected ---- */
+const Flags=(function(){
+  const KEY='wordburger.flagged.v1';
+  function sent(){ try{ return JSON.parse(localStorage.getItem(KEY))||[]; }catch(e){ return []; } }
+  function markSent(w){ try{ const s=sent(); s.push(w); localStorage.setItem(KEY, JSON.stringify(s.slice(-200))); }catch(e){} }
+  function paint(elId, rejected, day){
+    const box=$(elId); if(!box) return;
+    const done=sent();
+    const list=(rejected||[]).filter(w=>/^[a-z]{3,50}$/.test(w)).slice(0,6);
+    if(!list.length){ box.innerHTML=''; return; }
+    box.innerHTML='<div class="flagbox"><div class="fcap"><b>The kitchen turned these away.</b> '
+      +'Think one\u2019s a real word? Tap it and the chefs will take a look.</div><div class="flagchips">'
+      +list.map(w=>'<button type="button" class="flagchip'+(done.indexOf(w)>=0?' sent':'')+'" id="fl-'+w+'" '
+        +'onclick="Flags.send(\''+w+'\','+(day|0)+')">'+esc(w).toUpperCase()
+        +(done.indexOf(w)>=0?'<small>sent \u2713</small>':'<small>flag</small>')+'</button>').join('')
+      +'</div></div>';
+  }
+  function send(w, day){
+    if(typeof LEADERBOARD_URL==='undefined' || !LEADERBOARD_URL) return;
+    if(!/^[a-z]{3,50}$/.test(w)) return;
+    const chip=$('fl-'+w);
+    fetch(LEADERBOARD_URL+'/flag-word',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({word:w, day:day, deviceId:visitorId()})})
+    .then(function(r){ if(!r.ok) throw 0;
+      markSent(w);
+      if(chip){ chip.className='flagchip sent'; chip.innerHTML=esc(w).toUpperCase()+'<small>sent \u2713</small>'; }
+    }).catch(function(){
+      if(chip){ chip.innerHTML=esc(w).toUpperCase()+'<small>try later</small>'; }
+    });
+  }
+  return {paint:paint, send:send};
+})();
+
 function check(w, start, end, used){
   if(w.length < 3)                 return {ok:false, msg:'Three letters minimum.'};
   if(!/^[a-z]+$/.test(w))          return {ok:false, msg:'Letters only.'};
@@ -2692,6 +2740,8 @@ const Daily = (function(){
         snap.score>=90 ? 'Loaded stack!' :
         snap.score>=40 ? 'Nice stack' : 'On the board';
       $('drScore').textContent = snap.score;
+
+      Flags.paint('drFlags', snap.rejected||[], Daily.day);
       $('drFound').textContent = snap.words.length+'/'+pairTotal(snap.start,snap.end);
       $('drStreak').innerHTML = ICON_STREAK+' '+(s.playStreak||1);
       $('drBest').textContent = s.bestScore||snap.score;
@@ -3008,7 +3058,7 @@ const Round = (function(){
   function finish(){
     clearInterval(timer);
     st.running=false;
-    const snap={ day:Daily.day, score:st.score, words:st.words.slice(), start:st.start, end:st.end };
+    const snap={ day:Daily.day, score:st.score, words:st.words.slice(), start:st.start, end:st.end , rejected:(st.rejected||[]).slice() };
     if(st.mode==='daily'){
       const s=Store.get();
       track('daily_complete', {
@@ -3027,7 +3077,7 @@ const Round = (function(){
     begin(cfg){
       st = {
         mode:cfg.mode, start:cfg.start, end:cfg.end, seconds:cfg.seconds,
-        used:new Set(), words:[], score:0, running:true, warned:false, buf:'', invalid:false,
+        used:new Set(), words:[], score:0, running:true, warned:false, buf:'', invalid:false, rejected:[],
         total: pairTotal(cfg.start, cfg.end)
       };
       $('playWho').textContent = cfg.label;
@@ -3078,7 +3128,9 @@ const Round = (function(){
       const w=st.buf.trim().toLowerCase();
       if(!w) return;
       const r=check(w, st.start, st.end, st.used);
-      if(!r.ok){ st.invalid=true; paintBox('playBox', st.buf, st.start, st.end, st.invalid, 'Round.clear()'); shake('playEntry'); toast('playToast', r.msg); buzz([26,50,26]); return; }
+      if(!r.ok){
+        if(r.msg==='Not in the dictionary.' && st.rejected && st.rejected.indexOf(w)<0 && st.rejected.length<12) st.rejected.push(w);
+        st.invalid=true; paintBox('playBox', st.buf, st.start, st.end, st.invalid, 'Round.clear()'); shake('playEntry'); toast('playToast', r.msg); buzz([26,50,26]); return; }
       st.buf=''; st.invalid=false; paintBox('playBox', st.buf, st.start, st.end, st.invalid, 'Round.clear()');
       goHint('');
       const pts=scoreOf(w.length, r.tier);
@@ -3330,6 +3382,8 @@ const SlowCook = (function(){
         snap.score>=90 ? 'Loaded stack!' :
         snap.score>=40 ? 'Nice stack' : 'On the board';
       $('srScore').textContent = snap.score;
+
+      Flags.paint('srFlags', snap.rejected||[], SlowCook.day);
       $('srFound').textContent = snap.words.length+'/'+(snap.target||0);
       $('srStreak').innerHTML = ICON_STREAK+' '+(s.playStreak||1);
       $('srBest').textContent = s.slowBestScore||snap.score;
@@ -3421,7 +3475,7 @@ const SlowRound = (function(){
     clearInterval(timer);
     st.running=false;
     clearProgress();
-    const snap={ day:SlowCook.day, score:st.score, words:st.words.slice(), start:st.start, end:st.end, secs:Math.round(st.elapsed||0), target:st.target };
+    const snap={ day:SlowCook.day, score:st.score, words:st.words.slice(), start:st.start, end:st.end, secs:Math.round(st.elapsed||0), target:st.target , rejected:(st.rejected||[]).slice() };
     track('slowcook_complete', { puzzle:snap.day+1, score:snap.score, words:snap.words.length });
     SlowCook.record(snap); SlowCook.showResult();
   }
@@ -3430,7 +3484,7 @@ const SlowRound = (function(){
     begin(cfg){
       st = {
         start:cfg.start, end:cfg.end,
-        used:new Set(), words:[], score:0, running:true, buf:'', invalid:false,
+        used:new Set(), words:[], score:0, running:true, buf:'', invalid:false, rejected:[],
         target: targetFor(cfg.start, cfg.end), elapsed:0, startedAt: Date.now()
       };
       $('slowWho').textContent = cfg.label;
@@ -3500,7 +3554,9 @@ const SlowRound = (function(){
       const w=st.buf.trim().toLowerCase();
       if(!w) return;
       const r=check(w, st.start, st.end, st.used);
-      if(!r.ok){ st.invalid=true; paintBox('slowBox', st.buf, st.start, st.end, st.invalid, 'SlowRound.clear()'); shake('slowEntry'); toast('slowToast', r.msg); buzz([26,50,26]); return; }
+      if(!r.ok){
+        if(r.msg==='Not in the dictionary.' && st.rejected && st.rejected.indexOf(w)<0 && st.rejected.length<12) st.rejected.push(w);
+        st.invalid=true; paintBox('slowBox', st.buf, st.start, st.end, st.invalid, 'SlowRound.clear()'); shake('slowEntry'); toast('slowToast', r.msg); buzz([26,50,26]); return; }
       st.buf=''; st.invalid=false; paintBox('slowBox', st.buf, st.start, st.end, st.invalid, 'SlowRound.clear()');
       goHint('');
       const pts=scoreOf(w.length, r.tier);
