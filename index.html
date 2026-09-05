@@ -1225,9 +1225,9 @@ body::before{
   background:var(--panel-2); border:1px solid var(--line); color:var(--steel);
   display:flex; align-items:center; justify-content:center;
 }
-.profile-name-row{display:flex; align-items:center; justify-content:center; gap:8px; margin-top:10px}
-.profile-name-row span{font-family:var(--display); font-weight:800; font-size:20px}
-.edit-ic-btn{background:none; border:none; color:var(--steel); font-size:15px; cursor:pointer; padding:4px}
+.profile-name-row{display:flex; align-items:center; justify-content:center; gap:8px; margin-top:10px; background:none; border:none; cursor:pointer; padding:6px}
+.profile-name-row #profileName{font-family:var(--display); font-weight:800; font-size:20px; color:var(--cream)}
+.edit-ic-btn{color:var(--steel); font-size:15px}
 .profile-stats{display:flex; gap:var(--s3); margin-top:var(--s5)}
 .profile-stat{
   flex:1; display:flex; flex-direction:column; align-items:flex-start; gap:3px;
@@ -1764,10 +1764,10 @@ document.addEventListener('DOMContentLoaded', applyThemeChrome);
     <div class="profile-avatar">
       <svg viewBox="0 0 48 48" width="36" height="36"><circle cx="24" cy="15" r="8" fill="currentColor"/><path d="M9 40c1-10 7-15 15-15s14 5 15 15z" fill="currentColor"/></svg>
     </div>
-    <div class="profile-name-row">
+    <button class="profile-name-row" onclick="Username.openModal()" aria-label="Edit username">
       <span id="profileName">Player</span>
-      <button class="edit-ic-btn" onclick="Username.openModal()" aria-label="Edit username">✎</button>
-    </div>
+      <span class="edit-ic-btn">✎</span>
+    </button>
 
     <div class="profile-stats">
       <button class="profile-stat" onclick="Leaderboard.open(Daily.day, 'Classic')">
