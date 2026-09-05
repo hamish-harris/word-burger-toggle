@@ -1268,7 +1268,7 @@ body::before{ content:none; display:none; }
 .hx-item{background:linear-gradient(180deg,var(--panel-2),var(--panel)); border:1px solid var(--line); border-radius:var(--r-md); overflow:hidden; box-shadow:none; flex-shrink:0}
 .hx-row{display:flex; align-items:center; gap:10px; width:100%; background:none; border:0; padding:11px 12px; text-align:left; cursor:pointer; color:var(--cream); font:inherit}
 .hx-row:active{background:rgba(0,0,0,.18)}
-.hx-buns{font-family:var(--display); font-weight:700; font-size:15px; color:var(--mustard); background:rgba(0,0,0,.26); border:1px solid var(--line); border-radius:9px; padding:7px 9px; white-space:nowrap}
+.hx-buns{font-family:var(--display); font-weight:700; font-size:15px; color:#33241a; background:var(--bun); border:1px solid var(--bun-dk); border-radius:9px; padding:7px 9px; white-space:nowrap}
 .hx-buns i{font-style:normal; color:var(--steel); margin:0 2px}
 .hx-mid{flex:1; min-width:0; display:flex; flex-direction:column}
 .hx-mid b{font-family:var(--display); font-weight:700; font-size:14.5px; line-height:1.2}
@@ -1365,14 +1365,11 @@ html.light .sp{filter:drop-shadow(0 6px 0 rgba(51,36,26,.10))}
 html.light .sp-top i, html.light .seed{background:#f6efe0; box-shadow:none}
 html.light .sp-top, html.light .sp-bot{box-shadow:none}
 html.light .sp-burger{color:#f6efe0}
-html.light .btn{background:#D94A32; color:#f6efe0; box-shadow:none; border-radius:var(--r-md, 16px)}
-html.light .btn-play{background:#E5A72F; color:#2E241A}
+html.light .btn{background:#b23a24; color:#f6efe0; box-shadow:none; border-radius:var(--r-md, 16px)}
 html.light .btn:active{box-shadow:none; filter:brightness(.95)}
 html.light .btn.ghost{background:transparent; color:#33241a; box-shadow:none; border:1px solid #d9c9ab}
 html.light .btn.ghost:active{background:rgba(51,36,26,.04)}
-html.light .btn:focus-visible, html.light .icon-btn:focus-visible, html.light .chip-btn:focus-visible, html.light input:focus-visible{outline:2px solid #D94A32}
-html.light .share-box{background:repeating-linear-gradient(0deg,#FBF6EA 0 22px,#F2E9D8 22px 23px); color:#2E241A}
-html.light .names input{background:#FFFDF7; color:#2E241A}
+html.light .btn:focus-visible, html.light .icon-btn:focus-visible, html.light .chip-btn:focus-visible, html.light input:focus-visible{outline:2px solid #b23a24}
 /* daily card: thin rule instead of a boxed card, per redesign brief */
 html.light .daily{background:transparent; border:none; outline:none; box-shadow:none; margin-left:0; margin-right:0; padding-top:var(--s4); padding-bottom:var(--s4); border-top:1px solid #d9c9ab; border-bottom:1px solid #d9c9ab; border-radius:0}
 html.light .streaks .s{background:transparent; box-shadow:none; border:none; border-right:1px solid #d9c9ab}
@@ -1404,6 +1401,89 @@ html.light .key:active::before, html.light .key.popped::before{background:#d99a2
 html.light .key .pop{background:#33241a; color:#f6efe0; box-shadow:0 4px 12px rgba(51,36,26,.2)}
 html.light .key.act.popped{color:#f6efe0}
 html.light .key.go.cold{filter:none; opacity:.4}
+/* match the design-pack mock */
+html.light .btn{font-family:var(--display); text-transform:uppercase; letter-spacing:.08em; border-radius:12px; box-shadow:0 3px 0 #7c2818}
+html.light .daily .btn, html.light .btn-mustard{background:#d99a2b; color:#33241a; box-shadow:0 3px 0 #a06f10}
+html.light .daily .btn:active, html.light .btn-mustard:active{box-shadow:0 1px 0 #a06f10}
+html.light .btn:active{transform:translateY(2px); box-shadow:0 1px 0 #7c2818}
+html.light .btn.ghost{box-shadow:none; text-transform:none; letter-spacing:0; font-family:var(--ui); font-weight:600}
+html.light .btn.ghost:active{transform:none}
+html.light .seg button{text-transform:uppercase; letter-spacing:.08em; font-size:13px; font-weight:700; font-family:var(--ui); border:2px solid #d9c9ab; border-radius:12px}
+html.light .seg button.on{border:2px solid #33241a; font-weight:700}
+html.light .track .grad{background:linear-gradient(90deg,#b23a24,#d99a2b)}
+html.light .track{border-radius:99px; overflow:hidden}
+html.light .key.go{color:#f6efe0; font-family:var(--display); letter-spacing:.14em}
+html.light .key.go::before{background:#8a9a4a; border-color:#8a9a4a; box-shadow:0 3px 0 #5c6a2c; border-radius:11px}
+html.light .tile{background:transparent; border:none; border-radius:0}
+html.light .tiles .tile + .tile{border-left:1px solid #d9c9ab}
+html.light .tiles{border-top:1px solid #d9c9ab; border-bottom:1px solid #d9c9ab; padding:12px 0}
+html.light .tile .l{text-transform:uppercase; letter-spacing:.12em}
+html.light .streaks .s .l{text-transform:uppercase; letter-spacing:.12em}
+html.light .layer{box-shadow:none; border-bottom:1px solid rgba(51,36,26,.08)}
+html.light .ing0{background:#8a9a4a}
+html.light .ing1{background:#b23a24; color:#f6efe0}
+html.light .ing2{background:#d99a2b}
+html.light .ing3{background:#6b4a2e; color:#f6efe0}
+html.light .rare{background:rgba(51,36,26,.2); color:#f6efe0}
+html.light .b-bun .let{color:#5C3A17; text-shadow:none}
+html.light .toast{color:#f6efe0}
+html.light .share-box{background:#f6efe0; border:1px dashed #c9b592; color:#33241a}
+html.light .countdown b{color:#33241a}
+html.light .tile, html.light .row{background:transparent; border:1px solid #d9c9ab; box-shadow:none}
+html.light .board .p{background:transparent; border:1px solid #d9c9ab}
+html.light .board .p .s, html.light .board .p.now .s{color:#33241a}
+html.light .words .c{background:transparent; border-color:#d9c9ab}
+html.light .words .c b{color:#a06f10}
+html.light .hx-item{background:transparent; border:1px solid #d9c9ab; box-shadow:none}
+html.light .hx-item.open .hx-row{background:rgba(51,36,26,.04)}
+html.light #howto{background:rgba(51,36,26,.4)}
+html.light .howto-card{background:#f6efe0; box-shadow:0 10px 30px rgba(51,36,26,.16)}
+html.light .help-fab{background:transparent; color:#84684a; border:1px solid #d9c9ab; box-shadow:none}
+html.light #ppNames input{background:#fffdf6; color:#33241a; border:1px solid #d9c9ab; box-shadow:none}
+html.light .home-tag, html.light .sub, html.light .daily .meta, html.light .note{color:#84684a}
+html.light .who, html.light .timer .order{color:#84684a}
+html.light .tile .l, html.light .streaks .s .l, html.light .bun-card .cap{color:#8A7A68}
+html.light .rule{color:#8A7A68}
+html.light .countdown{color:#84684a}
+html.light .rank-badge{color:#84684a}
+html.light .progress .num{color:#84684a}
+html.light .hx-none, html.light .hx-empty{color:#84684a}
+html.light .label{color:#8A7A68}
+html.light .back{color:#84684a}
+html.light .big-score .u, html.light .score .u{color:#8A7A68}
+/* lb-list / leaderboard: thin outline for "you", not a heavy tint block */
+html.light .lb-row{background:transparent; border:1px solid #d9c9ab; box-shadow:none}
+html.light .lb-row.you{border:1.5px solid #33241a; background:transparent}
+html.light .lb-row.you .rk{color:#33241a}
+html.light .lb-row.you .nm{color:#33241a}
+html.light .lb-row .sc{color:#a06f10}
+html.light .lb-empty{color:#84684a}
+/* username chip + modal */
+html.light .username-chip{background:transparent; border:1px solid #d9c9ab; color:#84684a}
+html.light #usernameModal{background:rgba(51,36,26,.4)}
+html.light #usernameInput{background:#fffdf6; color:#33241a; border:1px solid #d9c9ab}
+html.light #usernameInput:focus{border-color:#b23a24}
+
+
+html.light .btn-play{background:#E5A72F; color:#2E241A}
+
+/* ---- primary buttons: the scheme's mustard, not the red ---- */
+html.light .btn:not(.ghost){ background:#d99a2b; color:#33241a; box-shadow:0 3px 0 #a06f10 }
+html.light .btn:not(.ghost):active{ box-shadow:0 1px 0 #a06f10 }
+html:not(.light) .btn:not(.ghost){ background:#d99a2b; color:#211711; box-shadow:0 3px 0 #8a5f0d }
+html:not(.light) .btn:not(.ghost):active{ box-shadow:0 1px 0 #8a5f0d }
+
+/* ---- GO: an ordinary key until the word is submittable, then the scheme's olive ---- */
+html.light .key.go.cold::before{ background:#efe3cb; border:none; box-shadow:0 2px 0 #d9c9ab; border-radius:9px }
+html.light .key.go.cold{ color:#33241a; filter:none; opacity:1 }
+html:not(.light) .key.go.cold::before{ background:#33241a; border:none; box-shadow:0 2px 0 rgba(0,0,0,.4); border-radius:9px }
+html:not(.light) .key.go.cold{ color:#f2e8d6; filter:none; opacity:1 }
+
+/* ---- the logo follows the new palette ---- */
+:root{ --logo-bun-top:#dfa963; --logo-bun-bot:#c98944; --logo-bar-word:#d99a2b;
+  --logo-bar-burger:#c94a32; --logo-ink:#33241a; --logo-cream:#f6efe0; --logo-seed:#f6efe0 }
+html.light{ --logo-bar-burger:#b23a24 }
+
 /* ---- bun letters: pin the line box so tall display metrics can't push
    the glyph past the bun's curved edge (worst in pass and play at 36px) ---- */
 .b-bun .let{ line-height:1; display:block }
@@ -1424,6 +1504,17 @@ html:not(.light) .pass-countdown{
 html:not(.light) .pass-countdown.urgent{
   background:var(--ketchup); border-color:var(--ketchup); color:#f6efe0;
 }
+
+/* the atomic icons sit inline with numbers; scale them for the big win icon */
+.at-emoji svg{width:56px; height:56px}
+.tile .n svg, .hx-sc svg, .c svg{width:1.05em; height:1.05em; vertical-align:-0.14em}
+
+
+/* --- kept from Hamish's push --- */
+
+html.light .names input{background:#FFFDF7; color:#2E241A}
+.at-emoji svg{width:56px; height:56px}
+.tile .n svg, .hx-sc svg, .c svg{width:1.05em; height:1.05em; vertical-align:-0.14em}
 </style>
 <script>
 function systemPrefersDark(){
@@ -1664,7 +1755,7 @@ document.addEventListener('DOMContentLoaded', applyThemeChrome);
     <div class="big-score"><span id="srScore">0</span><span class="u">points today</span></div>
     <div class="tiles">
       <div class="tile"><div class="n" id="srFound">0</div><div class="l">found</div></div>
-      <div class="tile"><div class="n" id="srStreak">🔥 1</div><div class="l">day streak</div></div>
+      <div class="tile"><div class="n" id="srStreak">1</div><div class="l">day streak</div></div>
       <div class="tile"><div class="n" id="srBest">0</div><div class="l">best ever</div></div>
       <div class="tile"><div class="n" id="srTime">0:00</div><div class="l">time taken</div></div>
       <div class="tile"><div class="n" id="srDiamonds">0</div><div class="l">rare words</div></div>
@@ -1695,7 +1786,7 @@ document.addEventListener('DOMContentLoaded', applyThemeChrome);
     <div class="big-score"><span id="drScore">0</span><span class="u">points today</span></div>
     <div class="tiles">
       <div class="tile"><div class="n" id="drFound">0</div><div class="l">found</div></div>
-      <div class="tile"><div class="n" id="drStreak">🔥 1</div><div class="l">day streak</div></div>
+      <div class="tile"><div class="n" id="drStreak">1</div><div class="l">day streak</div></div>
       <div class="tile"><div class="n" id="drBest">0</div><div class="l">best ever</div></div>
       <div class="tile"><div class="n" id="drDiamonds">0</div><div class="l">rare words today</div></div>
     </div>
@@ -1723,7 +1814,7 @@ document.addEventListener('DOMContentLoaded', applyThemeChrome);
       <div class="tile"><div class="n" id="hxPlayed">0</div><div class="l">played</div></div>
       <div class="tile"><div class="n" id="hxBest">0</div><div class="l">best score</div></div>
       <div class="tile"><div class="n" id="hxAvg">0</div><div class="l">average</div></div>
-      <div class="tile"><div class="n" id="hxDia">💎 0</div><div class="l">rare words</div></div>
+      <div class="tile"><div class="n" id="hxDia">0</div><div class="l">rare words</div></div>
     </div>
     <div class="rule">Tap a burger to see your words</div>
     <div class="hx-list" id="hxList"></div>
@@ -1876,7 +1967,7 @@ document.addEventListener('DOMContentLoaded', applyThemeChrome);
       <div class="tile"><div class="n" id="shxPlayed">0</div><div class="l">played</div></div>
       <div class="tile"><div class="n" id="shxBest">0</div><div class="l">best score</div></div>
       <div class="tile"><div class="n" id="shxAvg">0</div><div class="l">average</div></div>
-      <div class="tile"><div class="n" id="shxDia">💎 0</div><div class="l">rare words</div></div>
+      <div class="tile"><div class="n" id="shxDia">0</div><div class="l">rare words</div></div>
     </div>
     <div class="rule">Tap a burger to see your words</div>
     <div class="hx-list" id="shxList"></div>
@@ -1894,7 +1985,7 @@ document.addEventListener('DOMContentLoaded', applyThemeChrome);
     <div class="tiles">
       <div class="tile"><div class="n" id="frFound">0</div><div class="l">found</div></div>
       <div class="tile"><div class="n" id="frBest">—</div><div class="l">house special</div></div>
-      <div class="tile"><div class="n" id="frGems">0</div><div class="l">💎 rare finds</div></div>
+      <div class="tile"><div class="n" id="frGems">0</div><div class="l">rare finds</div></div>
     </div>
     <div class="words" id="frWords"></div>
     <div class="stack" style="margin-top:auto">
@@ -1990,7 +2081,7 @@ document.addEventListener('DOMContentLoaded', applyThemeChrome);
   <!-- PASS AND PLAY: WINNER -->
   <section class="screen" id="s-pp-win">
     <div class="mid">
-      <div class="emoji">🏆</div>
+      <div class="emoji at-emoji" id="ppWinIcon"></div>
       <h2 id="ppWin">Winner</h2>
       <p id="ppWinInfo">Last one standing.</p>
       <div class="rec-list" id="ppBoard" style="width:100%; max-width:290px; flex:none"></div>
@@ -2703,7 +2794,7 @@ const History = (function(){
   }
   function chips(words){
     return '<div class="words">'+words.slice().sort((a,b)=>b.pts-a.pts).map(o=>
-      '<span class="c">'+esc(o.w)+'<b>+'+o.pts+(o.tier===3?' 💎':o.tier===2?' ◆':'')+'</b></span>'
+      '<span class="c">'+esc(o.w)+'<b>+'+o.pts+(o.tier===3?' '+ICON_DIAMOND:o.tier===2?' \u25C6':'')+'</b></span>'
     ).join('')+'</div>';
   }
   return {
@@ -2716,7 +2807,7 @@ const History = (function(){
       $('hxPlayed').textContent = list.length;
       $('hxBest').textContent   = Math.max(s.bestScore||0, scores.length?Math.max.apply(null,scores):0);
       $('hxAvg').textContent    = scores.length ? Math.round(scores.reduce((a,b)=>a+b,0)/scores.length) : 0;
-      $('hxDia').textContent    = '💎 '+Math.max(s.diamonds||0, dia);
+      $('hxDia').innerHTML      = ICON_DIAMOND+' '+Math.max(s.diamonds||0, dia);
 
       $('hxList').innerHTML = list.length ? list.map((h,i)=>{
         const d=(h.words||[]).filter(o=>o.tier===3).length;
@@ -2727,7 +2818,7 @@ const History = (function(){
           +  '<button class="hx-row" onclick="History.toggle('+i+')">'
           +    '<span class="hx-buns">'+esc(h.start)+'<i>–</i>'+esc(h.end)+'</span>'
           +    '<span class="hx-mid"><b>Burger #'+(h.day+1)+'</b><small>'+dateOf(h.day)+'</small></span>'
-          +    '<span class="hx-sc">'+(h.score||0)+'<small>'+(h.found||0)+'/'+(h.total||0)+(d?' · 💎'+d:'')+'</small></span>'
+          +    '<span class="hx-sc">'+(h.score||0)+'<small>'+(h.found||0)+'/'+(h.total||0)+(d?' · '+ICON_DIAMOND+d:'')+'</small></span>'
           +  '</button>'
           +  '<div class="hx-body">'+body+'</div>'
           +'</div>';
@@ -2757,7 +2848,7 @@ const SlowHistory = (function(){
   }
   function chips(words){
     return '<div class="words">'+words.slice().sort((a,b)=>b.pts-a.pts).map(o=>
-      '<span class="c">'+esc(o.w)+'<b>+'+o.pts+(o.tier===3?' 💎':o.tier===2?' ◆':'')+'</b></span>'
+      '<span class="c">'+esc(o.w)+'<b>+'+o.pts+(o.tier===3?' '+ICON_DIAMOND:o.tier===2?' \u25C6':'')+'</b></span>'
     ).join('')+'</div>';
   }
   return {
@@ -2770,7 +2861,7 @@ const SlowHistory = (function(){
       $('shxPlayed').textContent = list.length;
       $('shxBest').textContent   = Math.max(s.slowBestScore||0, scores.length?Math.max.apply(null,scores):0);
       $('shxAvg').textContent    = scores.length ? Math.round(scores.reduce((a,b)=>a+b,0)/scores.length) : 0;
-      $('shxDia').textContent    = '💎 '+Math.max(s.slowDiamonds||0, dia);
+      $('shxDia').innerHTML      = ICON_DIAMOND+' '+Math.max(s.slowDiamonds||0, dia);
 
       $('shxList').innerHTML = list.length ? list.map((h,i)=>{
         const d=(h.words||[]).filter(o=>o.tier===3).length;
@@ -2781,7 +2872,7 @@ const SlowHistory = (function(){
           +  '<button class="hx-row" onclick="SlowHistory.toggle('+i+')">'
           +    '<span class="hx-buns">'+esc(h.start)+'<i>–</i>'+esc(h.end)+'</span>'
           +    '<span class="hx-mid"><b>Burger #'+(h.day+1)+'</b><small>'+dateOf(h.day)+'</small></span>'
-          +    '<span class="hx-sc">'+(h.score||0)+'<small>'+(h.found||0)+'/'+(h.target||0)+(d?' · 💎'+d:'')+'</small></span>'
+          +    '<span class="hx-sc">'+(h.score||0)+'<small>'+(h.found||0)+'/'+(h.target||0)+(d?' · '+ICON_DIAMOND+d:'')+'</small></span>'
           +  '</button>'
           +  '<div class="hx-body">'+body+'</div>'
           +'</div>';
@@ -3139,7 +3230,7 @@ const Free = (function(){
       const g=$('frWords'); g.innerHTML='';
       snap.words.slice().sort((a,b)=>b.pts-a.pts).forEach(o=>{
         const c=document.createElement('span'); c.className='c';
-        c.innerHTML=esc(o.w)+'<b>+'+o.pts+(o.tier===3?' 💎':o.tier===2?' ◆':'')+'</b>';
+        c.innerHTML=esc(o.w)+'<b>+'+o.pts+(o.tier===3?' '+ICON_DIAMOND:o.tier===2?' \u25C6':'')+'</b>';
         g.appendChild(c);
       });
       go('s-free-res');
@@ -3770,6 +3861,7 @@ const PP = (function(){
     const dest=$('ppWinFills');
     if(dest) dest.innerHTML = gameLog.slice().reverse().map(e=>layerHTML(e.w,e.pts,e.tier,e.who)).join('');
     Sound.bell(3,.72);
+    if($('ppWinIcon')) $('ppWinIcon').innerHTML = ICON_TROPHY;
     go('s-pp-win');
   }
 
