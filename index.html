@@ -939,6 +939,19 @@ body::before{
 .res-head h2{font-family:var(--display); font-weight:700; font-size:30px; margin-top:4px}
 
 .big-score{font-family:var(--display); font-weight:700; font-size:66px; color:var(--mustard); text-align:center; line-height:1; text-shadow:0 4px 30px var(--glow)}
+.rank-lb-row{
+  display:flex; align-items:center; justify-content:space-between; width:100%;
+  margin-top:var(--s4); padding:12px 16px; border-radius:var(--r-md);
+  background:var(--panel-2); border:1px solid var(--line); cursor:pointer;
+  font-family:var(--ui); font-size:13.5px; color:var(--cream);
+}
+.rlb-left{display:flex; align-items:center; gap:6px}
+.rlb-left b{font-family:var(--display); font-weight:700; color:var(--mustard-dk, var(--mustard))}
+.rlb-right{display:flex; align-items:center; gap:4px; color:var(--steel); font-weight:600}
+.share-icon-btn{
+  margin-left:auto; background:none; border:none; color:var(--cream); cursor:pointer; padding:6px;
+}
+.head{position:relative}
 .rank-badge{
   text-align:center; font-family:var(--ui); font-size:13.5px; color:var(--steel);
   margin-top:6px; margin-bottom:2px;
@@ -1231,6 +1244,39 @@ body::before{
 }
 .profile-row:last-child{border-bottom:1px solid var(--line)}
 .profile-row .chev{color:var(--steel); font-size:16px}
+
+/* APPEARANCE */
+.appear-list{display:flex; flex-direction:column; gap:10px}
+.appear-row{
+  display:flex; align-items:center; gap:14px; padding:14px 16px;
+  border-radius:var(--r-md); background:var(--panel-2); border:1px solid var(--line);
+  cursor:pointer; text-align:left; font-family:var(--ui);
+}
+.appear-ic{flex:none; width:34px; height:34px; display:flex; align-items:center; justify-content:center}
+.appear-tx{flex:1; min-width:0; display:flex; flex-direction:column; gap:2px}
+.appear-tx b{font-family:var(--display); font-weight:700; font-size:15px}
+.appear-tx small{font-size:12.5px; color:var(--steel)}
+.appear-radio{
+  flex:none; width:20px; height:20px; border-radius:50%; border:2px solid var(--line-hi);
+  position:relative;
+}
+.appear-row.on .appear-radio{border-color:var(--ketchup)}
+.appear-row.on .appear-radio::after{
+  content:''; position:absolute; inset:3px; border-radius:50%; background:var(--ketchup);
+}
+
+/* WORD LIST */
+.word-list-rows{display:flex; flex-direction:column; gap:8px; overflow-y:auto}
+.word-row{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:13px 16px; border-radius:var(--r-sm); font-family:var(--display); font-weight:700;
+}
+.word-row.wr0{background:var(--pickle); color:#26340A}
+.word-row.wr1{background:var(--ketchup); color:var(--cream)}
+.word-row.wr2{background:var(--mustard); color:#3A2A0A}
+.word-row.wr3{background:var(--patty); color:var(--cream)}
+.word-row .ww{letter-spacing:.02em}
+.word-row .wp{display:flex; align-items:center; gap:5px}
 .hx-item{background:linear-gradient(180deg,var(--panel-2),var(--panel)); border:1px solid var(--line); border-radius:var(--r-md); overflow:hidden; box-shadow:inset 0 1px 0 rgba(255,255,255,.04); flex-shrink:0}
 .hx-row{display:flex; align-items:center; gap:10px; width:100%; background:none; border:0; padding:11px 12px; text-align:left; cursor:pointer; color:var(--cream); font:inherit}
 .hx-row:active{background:rgba(0,0,0,.18)}
@@ -1355,11 +1401,21 @@ html.light #usernameInput{background:#FFFDF7; color:#2E241A; border:1px solid #D
 html.light #usernameInput:focus{border-color:#D94A32}
 </style>
 <script>
-(function(){
-  try{
-    if(localStorage.getItem('wordburger.theme')==='dark') document.documentElement.classList.remove('light');
-  }catch(e){}
-})();
+function systemPrefersDark(){
+  try{ return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches; }catch(e){ return false; }
+}
+function applyThemeClass(){
+  let pref; try{ pref = localStorage.getItem('wordburger.theme'); }catch(e){ pref = null; }
+  const wantLight = pref==='dark' ? false : pref==='system' ? !systemPrefersDark() : true; // default: light
+  document.documentElement.classList.toggle('light', wantLight);
+}
+applyThemeClass();
+try{
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(){
+    let pref; try{ pref = localStorage.getItem('wordburger.theme'); }catch(e){ pref = null; }
+    if(pref==='system'){ applyThemeClass(); applyThemeChrome(); }
+  });
+}catch(e){}
 function applyThemeChrome(){
   const light=document.documentElement.classList.contains('light');
   const tc=document.querySelector('meta[name="theme-color"]');
@@ -1374,11 +1430,17 @@ function applyThemeChrome(){
   });
   const tf=document.querySelector('.theme-fab');
   if(tf) tf.textContent=light?'\u263E':'\u2600';
+  if(typeof renderAppearance==='function') renderAppearance();
 }
 function toggleTheme(){
   const el=document.documentElement;
   el.classList.toggle('light');
   try{ localStorage.setItem('wordburger.theme', el.classList.contains('light')?'light':'dark'); }catch(e){}
+  applyThemeChrome();
+}
+function setThemeMode(mode){
+  try{ localStorage.setItem('wordburger.theme', mode); }catch(e){}
+  applyThemeClass();
   applyThemeChrome();
 }
 document.addEventListener('DOMContentLoaded', applyThemeChrome);
@@ -1556,13 +1618,13 @@ document.addEventListener('DOMContentLoaded', applyThemeChrome);
   <section class="screen" id="s-slow-res">
     <div class="head">
       <button class="back" onclick="go('s-home')">‹ Home</button>
+      <button class="icon-btn share-icon-btn" onclick="SlowShare.send()" aria-label="Share"></button>
     </div>
     <div class="res-head">
       <div class="eyebrow" id="srKicker">Word Burger #1</div>
       <h2 id="srTitle">Nice stack</h2>
     </div>
     <div class="big-score"><span id="srScore">0</span><span class="u">points today</span></div>
-    <div class="rank-badge rank-chev" id="srRank" style="display:none; cursor:pointer" onclick="Leaderboard.open(SlowCook.day+SLOW_DAY_OFFSET, 'Target')"><span class="live-dot"></span>Ranked <b>#<span id="srRankNum">-</span></b> today</div>
     <div class="tiles">
       <div class="tile"><div class="n" id="srFound">0</div><div class="l">found</div></div>
       <div class="tile"><div class="n" id="srStreak">🔥 1</div><div class="l">day streak</div></div>
@@ -1570,13 +1632,15 @@ document.addEventListener('DOMContentLoaded', applyThemeChrome);
       <div class="tile"><div class="n" id="srTime">0:00</div><div class="l">time taken</div></div>
       <div class="tile"><div class="n" id="srDiamonds">0</div><div class="l">rare words</div></div>
     </div>
+    <button class="rank-lb-row" id="srRank" style="display:none" onclick="Leaderboard.open(SlowCook.day+SLOW_DAY_OFFSET, 'Target')">
+      <span class="rlb-left rlb-trophy">#<b id="srRankNum">-</b> today</span>
+      <span class="rlb-right rlb-view">View leaderboard</span>
+    </button>
     <div class="share-box" id="srShareBox"></div>
     <button class="btn" id="srShareBtn" onclick="SlowShare.send()">Share result</button>
     <div class="countdown" id="srCountdown">Next burger in <b>--:--:--</b></div>
     <div class="stack" style="margin-top:auto">
-      <button class="btn ghost sm view-lb-btn" onclick="Leaderboard.open(SlowCook.day+SLOW_DAY_OFFSET, 'Target')">View leaderboard</button>
-      <button class="btn ghost sm" id="srRevealBtn" onclick="SlowCook.toggleWords()">Show my words</button>
-      <div class="words" id="srWords" style="display:none"></div>
+      <button class="btn ghost sm" onclick="WordList.open(Store.get().slowToday.words, 's-slow-res')">Show my words</button>
       <button class="btn ghost sm" onclick="go('s-home')">Back to home</button>
     </div>
   </section>
@@ -1585,26 +1649,28 @@ document.addEventListener('DOMContentLoaded', applyThemeChrome);
   <section class="screen" id="s-daily-res">
     <div class="head">
       <button class="back" onclick="go('s-home')">‹ Home</button>
+      <button class="icon-btn share-icon-btn" onclick="Share.send()" aria-label="Share"></button>
     </div>
     <div class="res-head">
       <div class="eyebrow" id="drKicker">Word Burger #1</div>
       <h2 id="drTitle">Nice stack</h2>
     </div>
     <div class="big-score"><span id="drScore">0</span><span class="u">points today</span></div>
-    <div class="rank-badge rank-chev" id="drRank" style="display:none; cursor:pointer" onclick="Leaderboard.open(Daily.day, 'Classic')"><span class="live-dot"></span>Ranked <b>#<span id="drRankNum">-</span></b> today</div>
     <div class="tiles">
       <div class="tile"><div class="n" id="drFound">0</div><div class="l">found</div></div>
       <div class="tile"><div class="n" id="drStreak">🔥 1</div><div class="l">day streak</div></div>
       <div class="tile"><div class="n" id="drBest">0</div><div class="l">best ever</div></div>
       <div class="tile"><div class="n" id="drDiamonds">0</div><div class="l">rare words today</div></div>
     </div>
+    <button class="rank-lb-row" id="drRank" style="display:none" onclick="Leaderboard.open(Daily.day, 'Classic')">
+      <span class="rlb-left rlb-trophy">#<b id="drRankNum">-</b> today</span>
+      <span class="rlb-right rlb-view">View leaderboard</span>
+    </button>
     <div class="share-box" id="shareBox"></div>
     <button class="btn" id="shareBtn" onclick="Share.send()">Share result</button>
     <div class="countdown" id="countdown">Next burger in <b>--:--:--</b></div>
     <div class="stack" style="margin-top:auto">
-      <button class="btn ghost sm view-lb-btn" onclick="Leaderboard.open(Daily.day, 'Classic')">View leaderboard</button>
-      <button class="btn ghost sm" id="revealBtn" onclick="Daily.toggleWords()">Show my words</button>
-      <div class="words" id="drWords" style="display:none"></div>
+      <button class="btn ghost sm" onclick="WordList.open(Store.get().today.words, 's-daily-res')">Show my words</button>
       <button class="btn ghost sm" onclick="History.open()">Past burgers</button>
       <button class="btn ghost sm" onclick="go('s-home')">Home</button>
     </div>
@@ -1719,8 +1785,48 @@ document.addEventListener('DOMContentLoaded', applyThemeChrome);
       <button class="profile-row" onclick="History.open()"><span>Game stats</span><span class="chev">›</span></button>
       <button class="profile-row" onclick="openHowto('s-profile')"><span>How to play</span><span class="chev">›</span></button>
       <button class="profile-row" onclick="Sound.toggle()"><span>Sound</span><span class="chev">›</span></button>
-      <button class="profile-row" onclick="toggleTheme()"><span>Appearance</span><span class="chev">›</span></button>
+      <button class="profile-row" onclick="go('s-appearance')"><span>Appearance</span><span class="chev">›</span></button>
     </div>
+  </section>
+
+  <!-- APPEARANCE -->
+  <section class="screen" id="s-appearance">
+    <div class="head">
+      <button class="back" onclick="go('s-profile')">‹</button>
+      <h2>Appearance</h2>
+    </div>
+    <div class="appear-list">
+      <button class="appear-row" data-mode="light" onclick="setThemeMode('light'); renderAppearance()">
+        <span class="appear-ic">
+          <svg viewBox="0 0 48 48" width="22" height="22"><circle cx="24" cy="24" r="9" fill="#E5A72F"/><g stroke="#E5A72F" stroke-width="3" stroke-linecap="round"><path d="M24 4v6M24 38v6M4 24h6M38 24h6M10 10l4 4M34 34l4 4M10 38l4-4M34 14l4-4"/></g></svg>
+        </span>
+        <span class="appear-tx"><b>Light</b><small>A clean, classic look.</small></span>
+        <span class="appear-radio"></span>
+      </button>
+      <button class="appear-row" data-mode="dark" onclick="setThemeMode('dark'); renderAppearance()">
+        <span class="appear-ic">
+          <svg viewBox="0 0 48 48" width="22" height="22"><path d="M34 26a14 14 0 1 1-12-20 11 11 0 0 0 12 20z" fill="#75695E"/></svg>
+        </span>
+        <span class="appear-tx"><b>Dark</b><small>Easy on the eyes.</small></span>
+        <span class="appear-radio"></span>
+      </button>
+      <button class="appear-row" data-mode="system" onclick="setThemeMode('system'); renderAppearance()">
+        <span class="appear-ic">
+          <svg viewBox="0 0 48 48" width="22" height="22"><circle cx="24" cy="24" r="17" fill="none" stroke="#75695E" stroke-width="3"/><path d="M24 7a17 17 0 0 1 0 34z" fill="#75695E"/></svg>
+        </span>
+        <span class="appear-tx"><b>System</b><small>Matches your device.</small></span>
+        <span class="appear-radio"></span>
+      </button>
+    </div>
+  </section>
+
+  <!-- WORD LIST -->
+  <section class="screen" id="s-word-list">
+    <div class="head">
+      <button class="back" onclick="WordList.close()">‹</button>
+      <h2 id="wordListTitle">Your words</h2>
+    </div>
+    <div class="word-list-rows" id="wordListRows"></div>
   </section>
 
   <!-- SLOW COOK: PAST BURGERS -->
@@ -2019,6 +2125,25 @@ const Leaderboard = (function(){
   };
 })();
 
+const WordList = (function(){
+  let returnTo = 's-home';
+  function rowHtml(o){
+    return '<div class="word-row wr'+tierOfLen(o.w.length)+'">'
+      + '<span class="ww">'+esc(o.w.toUpperCase())+'</span>'
+      + '<span class="wp">'+(o.tier>=2?ICON_DIAMOND:'')+'+'+o.pts+'</span>'
+      + '</div>';
+  }
+  return {
+    open(words, from){
+      returnTo = from || 's-home';
+      $('wordListTitle').textContent = 'Your words ('+words.length+')';
+      $('wordListRows').innerHTML = words.slice().sort((a,b)=>b.pts-a.pts).map(rowHtml).join('');
+      go('s-word-list');
+    },
+    close(){ go(returnTo); }
+  };
+})();
+
 document.addEventListener('click', function(e){
   const b = e.target.closest('#lbPeriodToggle button');
   if(!b) return;
@@ -2122,6 +2247,7 @@ function go(id){
   document.body.classList.toggle('locked', SCROLL_LOCK_SCREENS.has(id));
   if(id==='s-home' && typeof renderHome==='function') renderHome();
   if(id==='s-profile' && typeof renderProfile==='function') renderProfile();
+  if(id==='s-appearance' && typeof renderAppearance==='function') renderAppearance();
 }
 function scoreOf(len, tier){ return Math.round((len-2)*(len-1)/2*MULT[tier]); }
 function tierOfLen(len){ return len>=9?3 : len>=7?2 : len>=5?1 : 0; }
@@ -2501,14 +2627,6 @@ const Daily = (function(){
       checkDailyRank(snap.day, snap.score); // immediate refresh — read-only
       startRankPolling(snap); // then keep it live while this screen is open
 
-      const g=$('drWords'); g.innerHTML=''; g.style.display='none';
-      $('revealBtn').textContent='Show my words';
-      snap.words.slice().sort((a,b)=>b.pts-a.pts).forEach(o=>{
-        const c=document.createElement('span'); c.className='c';
-        c.innerHTML=esc(o.w)+'<b>+'+o.pts+(o.tier===3?' 💎':o.tier===2?' ◆':'')+'</b>';
-        g.appendChild(c);
-      });
-
       go('s-daily-res');
       clearInterval(cd);
       const tick=()=>{
@@ -2519,12 +2637,6 @@ const Daily = (function(){
         $('countdown').innerHTML='Next burger in <b>'+h+':'+String(Math.floor(s2/60)).padStart(2,'0')+':'+String(s2%60).padStart(2,'0')+'</b>';
       };
       tick(); cd=setInterval(tick,1000);
-    },
-    toggleWords(){
-      const g=$('drWords'), b=$('revealBtn');
-      const showing = g.style.display!=='none';
-      g.style.display = showing?'none':'flex';
-      b.textContent = showing?'Show my words':'Hide my words';
     }
   };
 })();
@@ -2671,7 +2783,10 @@ function renderHome(){
       <div class="eyebrow">${dateLbl}</div>
       <h2>Today's burger is stacked</h2>
       <div class="meta">Burger #${Daily.day+1} · you scored ${s.today.score}</div>
-      <div class="rank-badge" id="homeRank" style="display:none; cursor:pointer" onclick="Leaderboard.open(Daily.day, 'Classic')"><span class="live-dot"></span>Ranked <b>#<span id="homeRankNum">-</span></b> today ${ICON_CHEVRON}</div>
+      <button class="rank-lb-row" id="homeRank" style="display:none" onclick="Leaderboard.open(Daily.day, 'Classic')">
+        <span class="rlb-left">${ICON_TROPHY} #<b id="homeRankNum">-</b> today</span>
+        <span class="rlb-right">View leaderboard ${ICON_CHEVRON}</span>
+      </button>
       <button class="btn" onclick="Daily.showResult()">See result and share</button>
       ${toggleHtml}
       ${streaks}` : `
@@ -2705,7 +2820,10 @@ function renderHome(){
       <div class="eyebrow">${dateLbl}</div>
       <h2>Today's burger is stacked</h2>
       <div class="meta">Burger #${SlowCook.day+1} · you scored ${s.slowToday.score}</div>
-      <div class="rank-badge" id="slowHomeRank" style="display:none; cursor:pointer" onclick="Leaderboard.open(SlowCook.day+SLOW_DAY_OFFSET, 'Target')"><span class="live-dot"></span>Ranked <b>#<span id="slowHomeRankNum">-</span></b> today ${ICON_CHEVRON}</div>
+      <button class="rank-lb-row" id="slowHomeRank" style="display:none" onclick="Leaderboard.open(SlowCook.day+SLOW_DAY_OFFSET, 'Target')">
+        <span class="rlb-left">${ICON_TROPHY} #<b id="slowHomeRankNum">-</b> today</span>
+        <span class="rlb-right">View leaderboard ${ICON_CHEVRON}</span>
+      </button>
       <button class="btn" onclick="SlowCook.showResult()">See result and share</button>
       ${toggleHtml}
       ${streaks}` : `
@@ -2726,6 +2844,13 @@ function renderHome(){
 
     $('pastWrap').innerHTML = `<button class="btn ghost sm" onclick="SlowHistory.open()">Past burgers</button>`;
   }
+}
+
+function renderAppearance(){
+  let pref; try{ pref = localStorage.getItem('wordburger.theme') || 'light'; }catch(e){ pref = 'light'; }
+  document.querySelectorAll('.appear-row').forEach(r=>{
+    r.classList.toggle('on', r.dataset.mode===pref);
+  });
 }
 
 function renderProfile(){
@@ -3136,14 +3261,6 @@ const SlowCook = (function(){
         else { srRankEl.style.display='none'; }
       }
 
-      const g=$('srWords'); g.innerHTML=''; g.style.display='none';
-      $('srRevealBtn').textContent='Show my words';
-      snap.words.slice().sort((a,b)=>b.pts-a.pts).forEach(o=>{
-        const c=document.createElement('span'); c.className='c';
-        c.innerHTML=esc(o.w)+'<b>+'+o.pts+(o.tier===3?' 💎':o.tier===2?' ◆':'')+'</b>';
-        g.appendChild(c);
-      });
-
       go('s-slow-res');
       checkSlowRank(snap.day, snap.score);
       startSlowRankPolling(snap);
@@ -3156,12 +3273,6 @@ const SlowCook = (function(){
         $('srCountdown').innerHTML='Next burger in <b>'+h+':'+String(Math.floor(s2/60)).padStart(2,'0')+':'+String(s2%60).padStart(2,'0')+'</b>';
       };
       tick(); cd=setInterval(tick,1000);
-    },
-    toggleWords(){
-      const g=$('srWords'), b=$('srRevealBtn');
-      const showing = g.style.display!=='none';
-      g.style.display = showing?'none':'flex';
-      b.textContent = showing?'Show my words':'Hide my words';
     }
   };
 })();
@@ -3808,6 +3919,9 @@ $('freeDiff').addEventListener('click', e=>{
   document.querySelectorAll('.view-lb-btn').forEach(b=>{ b.innerHTML = ICON_LEADERBOARD+' View leaderboard '+ICON_CHEVRON; });
   document.querySelectorAll('.rank-chev').forEach(b=>{ b.innerHTML += ' '+ICON_CHEVRON; });
   document.querySelectorAll('.modal-close-x').forEach(b=>{ b.innerHTML = ICON_CLOSE; });
+  document.querySelectorAll('.rlb-trophy').forEach(el=>{ el.innerHTML = ICON_TROPHY+' '+el.innerHTML; });
+  document.querySelectorAll('.rlb-view').forEach(el=>{ el.innerHTML = el.textContent+' '+ICON_CHEVRON; });
+  document.querySelectorAll('.share-icon-btn').forEach(b=>{ b.innerHTML = ICON_SHARE; });
   document.querySelectorAll('#shareBtn, #srShareBtn').forEach(b=>{ b.innerHTML = ICON_SHARE+' '+b.textContent; });
 
   /* ---- Confetti burst on a solved daily ---------------------- */
