@@ -1532,7 +1532,15 @@ document.addEventListener('DOMContentLoaded', applyThemeChrome);
       <button class="back" onclick="go('s-home')">‹ Back</button>
       <h2>Free play</h2>
     </div>
-    <p class="sub">Unlimited practice rounds. Sixty seconds on the clock. Letters reveal the moment you start.</p>
+    <p class="sub" id="freeSub">Unlimited practice rounds. Sixty seconds on the clock. Letters reveal the moment you start.</p>
+
+    <div style="margin-top:var(--s5)">
+      <div class="label">Game mode</div>
+      <div class="seg" id="freeMode">
+        <button data-m="classic" class="on">Classic game</button>
+        <button data-m="target">Target game</button>
+      </div>
+    </div>
 
     <div style="margin-top:var(--s5)">
       <div class="label">Difficulty</div>
@@ -3076,7 +3084,7 @@ buildKeys('playKeys', Round);
    FREE PLAY
    ============================================================ */
 const Free = (function(){
-  let start='A', end='D', difficulty='medium';
+  let start='A', end='D', difficulty='medium', mode='classic';
   let recentPairs=[];
   const RECENT_WINDOW=8;
   function roll(){
@@ -3097,11 +3105,25 @@ const Free = (function(){
     recentPairs.push(pick);
     if(recentPairs.length>RECENT_WINDOW) recentPairs.shift();
   }
+  function launch(){
+    if(mode==='target'){
+      SlowRound.begin({start, end, label:'Free play', source:'free'});
+    } else {
+      Round.begin({mode:'free', start, end, seconds:60, label:'Free play'});
+    }
+  }
   return {
     open(){ go('s-free'); },
     setDifficulty(d){ difficulty=d; },
-    start(){ Sound.ensure(); roll(); track('freeplay_start', {difficulty}); Round.begin({mode:'free', start, end, seconds:60, label:'Free play'}); },
-    again(){ roll(); Round.begin({mode:'free', start, end, seconds:60, label:'Free play'}); },
+    setMode(m){
+      mode=m;
+      const sub=$('freeSub');
+      if(sub) sub.textContent = mode==='target'
+        ? 'Unlimited practice rounds. No clock — stack every word that fits to hit the target.'
+        : 'Unlimited practice rounds. Sixty seconds on the clock. Letters reveal the moment you start.';
+    },
+    start(){ Sound.ensure(); roll(); track('freeplay_start', {difficulty, mode}); launch(); },
+    again(){ roll(); launch(); },
     showResult(snap){
       const best=snap.words.slice().sort((a,b)=>b.pts-a.pts)[0];
       const gems=snap.words.filter(o=>o.tier===3).length;
@@ -3112,6 +3134,25 @@ const Free = (function(){
         snap.score>=40 ? 'Nice stack' : 'On the board';
       $('frScore').textContent=snap.score;
       $('frFound').textContent=snap.words.length+'/'+pairTotal(snap.start,snap.end);
+      $('frBest').textContent=best?best.w.toUpperCase():'—';
+      $('frGems').textContent=gems;
+      const g=$('frWords'); g.innerHTML='';
+      snap.words.slice().sort((a,b)=>b.pts-a.pts).forEach(o=>{
+        const c=document.createElement('span'); c.className='c';
+        c.innerHTML=esc(o.w)+'<b>+'+o.pts+(o.tier===3?' 💎':o.tier===2?' ◆':'')+'</b>';
+        g.appendChild(c);
+      });
+      go('s-free-res');
+    },
+    showTargetResult(snap){
+      const best=snap.words.slice().sort((a,b)=>b.pts-a.pts)[0];
+      const gems=snap.words.filter(o=>o.tier===3).length;
+      $('frKicker').textContent = snap.start+' → '+snap.end;
+      $('frTitle').textContent =
+        snap.words.length>=snap.target ? 'Loaded stack!' :
+        snap.score>=40 ? 'Nice stack' : 'On the board';
+      $('frScore').textContent=snap.score;
+      $('frFound').textContent=snap.words.length+'/'+snap.target;
       $('frBest').textContent=best?best.w.toUpperCase():'—';
       $('frGems').textContent=gems;
       const g=$('frWords'); g.innerHTML='';
@@ -3365,7 +3406,7 @@ const SlowRound = (function(){
   // persists mid-round progress so leaving and coming back (same day)
   // picks up exactly where you left off
   function saveProgress(){
-    if(!st) return;
+    if(!st || st.source==='free') return;
     const s=Store.get();
     s.slowInProgress = {
       day: SlowCook.day, start:st.start, end:st.end,
@@ -3390,14 +3431,19 @@ const SlowRound = (function(){
     st.running=false;
     clearProgress();
     const snap={ day:SlowCook.day, score:st.score, words:st.words.slice(), start:st.start, end:st.end, secs:Math.round(st.elapsed||0), target:st.target };
-    track('slowcook_complete', { puzzle:snap.day+1, score:snap.score, words:snap.words.length });
-    SlowCook.record(snap); SlowCook.showResult();
+    if(st.source==='free'){
+      track('freeplay_target_complete', { score:snap.score, words:snap.words.length });
+      Free.showTargetResult(snap);
+    } else {
+      track('slowcook_complete', { puzzle:snap.day+1, score:snap.score, words:snap.words.length });
+      SlowCook.record(snap); SlowCook.showResult();
+    }
   }
 
   return {
     begin(cfg){
       st = {
-        start:cfg.start, end:cfg.end,
+        start:cfg.start, end:cfg.end, source:cfg.source||'daily',
         used:new Set(), words:[], score:0, running:true, buf:'', invalid:false,
         target: targetFor(cfg.start, cfg.end), elapsed:0, startedAt: Date.now()
       };
@@ -3506,7 +3552,7 @@ const SlowRound = (function(){
     quitTap(){
       const b=$('slowQuitBtn');
       if(!quitArmed){
-        quitArmed=true; b.classList.add('armed'); b.textContent='Leave?';
+        quitArmed=true; b.classList.add('armed'); b.textContent = (st && st.source==='free') ? 'Quit?' : 'Leave?';
         quitTimer=setTimeout(resetQuitS, 2400);
         return;
       }
@@ -3889,6 +3935,13 @@ $('freeDiff').addEventListener('click', e=>{
   paintDifficulty(b.dataset.d);
 });
 paintDifficulty(document.querySelector('#freeDiff button.on')?.dataset.d || 'medium');
+
+$('freeMode').addEventListener('click', e=>{
+  const b=e.target.closest('button'); if(!b) return;
+  document.querySelectorAll('#freeMode button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');
+  Free.setMode(b.dataset.m);
+});
 
 /* ============================================================
    BOOT
