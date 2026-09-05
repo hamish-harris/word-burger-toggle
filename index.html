@@ -1107,6 +1107,14 @@ body::before{
   display:grid; place-items:center; box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
 }
 .theme-fab{left:var(--pad-x); right:auto; font-size:14px}
+.profile-pill{
+  position:absolute; top:var(--pad-t); right:var(--pad-x); z-index:8;
+  display:flex; align-items:center; gap:6px; height:32px; padding:0 14px 0 10px;
+  border-radius:999px; border:1px solid var(--line-hi);
+  background:linear-gradient(180deg,var(--panel-hi),var(--panel)); color:var(--cream);
+  font-family:var(--ui); font-weight:600; font-size:13px; cursor:pointer;
+}
+.profile-pill svg{color:var(--steel); flex:none}
 
 .help-fab:active{transform:translateY(1px); color:var(--mustard)}
 
@@ -1172,6 +1180,56 @@ body::before{
 .lb-row.you .nm{font-weight:700; color:var(--cream)}
 .lb-row .sc{font-family:var(--display); font-weight:700; font-size:15px; color:var(--mustard); flex:none}
 .lb-empty{color:var(--steel); text-align:center; padding:40px 20px; font-size:14px}
+
+/* HOW TO PLAY (screen) */
+.howto-title{font-family:var(--display); font-weight:800; font-size:26px; text-align:center; margin-top:var(--s2)}
+.howto-lead{text-align:center; margin-bottom:var(--s5)}
+.howto-rows{display:flex; flex-direction:column; gap:var(--s5)}
+.howto-row{display:flex; align-items:flex-start; gap:14px}
+.howto-ic{
+  width:64px; height:64px; border-radius:50%; flex:none;
+  background:var(--panel-2); border:1px solid var(--line);
+  display:flex; align-items:center; justify-content:center;
+}
+.howto-tx{padding-top:6px}
+.howto-tx b{display:block; font-family:var(--display); font-weight:700; font-size:15.5px; margin-bottom:3px}
+.howto-tx span{font-size:13.5px; color:var(--steel); line-height:1.4; display:block}
+.howto-guide{
+  margin-top:var(--s6); padding:var(--s4); border-radius:var(--r-lg);
+  background:var(--panel-2); border:1px solid var(--line);
+}
+.howto-tierbar{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:12px 16px; border-radius:var(--r-sm); font-family:var(--display); font-weight:700;
+  font-size:13.5px; text-transform:uppercase; letter-spacing:.02em; margin-top:8px;
+}
+.howto-tierbar:first-of-type{margin-top:10px}
+
+/* PROFILE */
+.profile-avatar{
+  width:64px; height:64px; border-radius:50%; margin:var(--s4) auto 0;
+  background:var(--panel-2); border:1px solid var(--line); color:var(--steel);
+  display:flex; align-items:center; justify-content:center;
+}
+.profile-name-row{display:flex; align-items:center; justify-content:center; gap:8px; margin-top:10px}
+.profile-name-row span{font-family:var(--display); font-weight:800; font-size:20px}
+.edit-ic-btn{background:none; border:none; color:var(--steel); font-size:15px; cursor:pointer; padding:4px}
+.profile-stats{display:flex; gap:var(--s3); margin-top:var(--s5)}
+.profile-stat{
+  flex:1; display:flex; flex-direction:column; align-items:flex-start; gap:3px;
+  padding:14px 16px; border-radius:var(--r-md); background:var(--panel-2); border:1px solid var(--line);
+  cursor:pointer; text-align:left;
+}
+.ps-rank{font-family:var(--display); font-weight:800; font-size:19px; color:var(--mustard-dk, var(--mustard))}
+.ps-label{font-size:11.5px; color:var(--steel); text-transform:uppercase; letter-spacing:.04em}
+.profile-list{display:flex; flex-direction:column; margin-top:var(--s5)}
+.profile-row{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:15px 4px; background:none; border:none; border-top:1px solid var(--line);
+  font-size:15px; color:var(--cream); cursor:pointer; text-align:left; font-family:var(--ui);
+}
+.profile-row:last-child{border-bottom:1px solid var(--line)}
+.profile-row .chev{color:var(--steel); font-size:16px}
 .hx-item{background:linear-gradient(180deg,var(--panel-2),var(--panel)); border:1px solid var(--line); border-radius:var(--r-md); overflow:hidden; box-shadow:inset 0 1px 0 rgba(255,255,255,.04); flex-shrink:0}
 .hx-row{display:flex; align-items:center; gap:10px; width:100%; background:none; border:0; padding:11px 12px; text-align:left; cursor:pointer; color:var(--cream); font:inherit}
 .hx-row:active{background:rgba(0,0,0,.18)}
@@ -1367,8 +1425,7 @@ document.addEventListener('DOMContentLoaded', applyThemeChrome);
         <text x="160" y="129" text-anchor="middle" dominant-baseline="central" font-family="Fredoka,'Trebuchet MS',sans-serif" font-weight="700" font-size="29" fill="#F6EEDC">BURGER</text>
         <rect x="32" y="152" width="256" height="20" rx="10" fill="#C6975B"/>
       </svg>
-      <p class="home-tag" id="homeTag">Two letters. Sixty seconds. Stack every word that fits between the buns.</p>
-      <button class="username-chip" id="usernameChip" style="visibility:hidden" onclick="Username.openModal()"><span class="edit-ic">✎</span></button>
+      <p class="home-tag" id="homeTag">Two letters. Sixty seconds. Good words. Taste better.</p>
     </div>
 
     <div class="daily" id="dailyCard"></div>
@@ -1582,6 +1639,89 @@ document.addEventListener('DOMContentLoaded', applyThemeChrome);
     <div class="lb-list" id="lbList"></div>
   </section>
 
+  <!-- HOW TO PLAY -->
+  <section class="screen" id="s-howto">
+    <div class="head">
+      <button class="back" onclick="exitHowto()">‹</button>
+    </div>
+    <h2 class="howto-title">How to play</h2>
+    <p class="sub howto-lead">Two buns. Stack every word that fits between them.</p>
+
+    <div class="howto-rows">
+      <div class="howto-row">
+        <div class="howto-ic">
+          <svg viewBox="0 0 48 48" width="30" height="30"><rect x="8" y="12" width="32" height="7" rx="3.5" fill="#E5A72F"/><rect x="8" y="24" width="32" height="7" rx="3.5" fill="#E5A72F"/><rect x="8" y="29" width="32" height="7" rx="3.5" fill="#C6975B"/></svg>
+        </div>
+        <div class="howto-tx">
+          <b>Mind the buns</b>
+          <span>Every word must start with the top letter and end with the bottom letter.</span>
+        </div>
+      </div>
+      <div class="howto-row">
+        <div class="howto-ic">
+          <svg viewBox="0 0 48 48" width="30" height="30"><rect x="6" y="15" width="36" height="20" rx="4" fill="#2E241A"/><rect x="10" y="19" width="5" height="4" rx="1" fill="#F6EEDC"/><rect x="17" y="19" width="5" height="4" rx="1" fill="#F6EEDC"/><rect x="24" y="19" width="5" height="4" rx="1" fill="#F6EEDC"/><rect x="31" y="19" width="7" height="4" rx="1" fill="#F6EEDC"/><rect x="10" y="26" width="5" height="4" rx="1" fill="#F6EEDC"/><rect x="17" y="26" width="14" height="4" rx="1" fill="#F6EEDC"/><rect x="33" y="26" width="5" height="4" rx="1" fill="#F6EEDC"/></svg>
+        </div>
+        <div class="howto-tx">
+          <b>Three letters or more</b>
+          <span>Tap the built-in keys to build a word, then hit GO. It has to be a real word in the dictionary.</span>
+        </div>
+      </div>
+      <div class="howto-row">
+        <div class="howto-ic">
+          <svg viewBox="0 0 48 48" width="30" height="30"><path d="M24 8 L36 18 L24 40 L12 18 Z" fill="#7FA8C9"/><path d="M24 8 L36 18 L24 22 Z" fill="#9BC0DE"/><path d="M24 8 L12 18 L24 22 Z" fill="#6C93B5"/></svg>
+        </div>
+        <div class="howto-tx">
+          <b>Longer stacks score bigger</b>
+          <span>The longer and rarer the word, the more points and the fancier the ingredient.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="howto-guide">
+      <div class="rule">Ingredient guide</div>
+      <div class="howto-tierbar" style="background:#76957A; color:#fff">3–4 letters<b>Lettuce</b></div>
+      <div class="howto-tierbar" style="background:#D94A32; color:#fff">5–6 letters<b>Tomato</b></div>
+      <div class="howto-tierbar" style="background:#E5A72F; color:#2E241A">7–8 letters<b>Cheese</b></div>
+      <div class="howto-tierbar" style="background:#6B4A2F; color:#fff">9+ letters<b>Patty</b></div>
+    </div>
+
+    <button class="btn" onclick="exitHowto()" style="margin-top:var(--s5)">Let's eat</button>
+  </section>
+
+  <!-- PROFILE -->
+  <section class="screen" id="s-profile">
+    <div class="head">
+      <button class="back" onclick="go('s-home')">‹</button>
+      <h2>Your profile</h2>
+    </div>
+    <div class="profile-avatar">
+      <svg viewBox="0 0 48 48" width="36" height="36"><circle cx="24" cy="17" r="9" fill="currentColor"/><path d="M6 44c0-10 8-16 18-16s18 6 18 16" fill="currentColor"/></svg>
+    </div>
+    <div class="profile-name-row">
+      <span id="profileName">Player</span>
+      <button class="edit-ic-btn" onclick="Username.openModal()" aria-label="Edit username">✎</button>
+    </div>
+
+    <div class="profile-stats">
+      <button class="profile-stat" onclick="Leaderboard.open(Daily.day, 'Classic')">
+        <span class="ps-rank" id="profileDailyRank">#-</span>
+        <span class="ps-label">Daily rank</span>
+      </button>
+      <button class="profile-stat" onclick="Leaderboard.open(Daily.day, 'Classic'); Leaderboard.setPeriod('week')">
+        <span class="ps-rank" id="profileWeeklyRank">#-</span>
+        <span class="ps-label">Weekly rank</span>
+      </button>
+    </div>
+
+    <div class="profile-list">
+      <button class="profile-row" onclick="Username.openModal()"><span>Edit username</span><span class="chev">›</span></button>
+      <button class="profile-row" onclick="History.open()"><span>Game stats</span><span class="chev">›</span></button>
+      <button class="profile-row" onclick="openHowto('s-profile')"><span>How to play</span><span class="chev">›</span></button>
+      <button class="profile-row" onclick="Sound.toggle()"><span>Sound</span><span class="chev">›</span></button>
+      <button class="profile-row" onclick="toggleTheme()"><span>Appearance</span><span class="chev">›</span></button>
+    </div>
+  </section>
+
   <!-- SLOW COOK: PAST BURGERS -->
   <section class="screen" id="s-slow-history">
     <div class="head">
@@ -1774,11 +1914,14 @@ const Username = (function(){
     }catch(e){}
   }
   function render(){
-    const chip = $('usernameChip');
-    if(chip && current){
-      chip.innerHTML = esc(current)+' <span class="edit-ic">✎</span>';
-      chip.style.visibility = 'visible';
+    if(!current) return;
+    const pill = $('profilePill'), pillName = $('profilePillName');
+    if(pill && pillName){
+      pillName.textContent = current;
+      pill.style.visibility = 'visible';
     }
+    const profileName = $('profileName');
+    if(profileName) profileName.textContent = current;
   }
   function openModal(){
     const input=$('usernameInput');
@@ -1816,7 +1959,7 @@ const Username = (function(){
       errEl.textContent = 'Network error. Try again.';
     }
   }
-  return { init, openModal, closeModal, save };
+  return { init, openModal, closeModal, save, render };
 })();
 
 const Leaderboard = (function(){
@@ -1859,6 +2002,7 @@ const Leaderboard = (function(){
     },
     setPeriod(period){
       curPeriod = period;
+      document.querySelectorAll('#lbPeriodToggle button').forEach(b=>b.classList.toggle('on', b.dataset.period===period));
       load();
     },
     close(){ go('s-home'); }
@@ -1949,11 +2093,25 @@ const Store = (function(){
    ============================================================ */
 const $ = id => document.getElementById(id);
 const SCROLL_LOCK_SCREENS = new Set(['s-play','s-pp-play','s-pp-win','s-pp-pass','s-slow-play']);
+const HOWTO_KEY = '__wb_seen_howto';
+function seenHowto(){ try{ return !!localStorage.getItem(HOWTO_KEY); }catch(e){ return false; } }
+function markHowto(){ try{ localStorage.setItem(HOWTO_KEY,'1'); }catch(e){} }
+let howtoReturnTo = 's-profile';
+function openHowto(returnTo){
+  howtoReturnTo = returnTo || 's-profile';
+  markHowto();
+  go('s-howto');
+}
+function exitHowto(){
+  go(howtoReturnTo);
+}
+
 function go(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
   $(id).classList.add('on');
   document.body.classList.toggle('locked', SCROLL_LOCK_SCREENS.has(id));
   if(id==='s-home' && typeof renderHome==='function') renderHome();
+  if(id==='s-profile' && typeof renderProfile==='function') renderProfile();
 }
 function scoreOf(len, tier){ return Math.round((len-2)*(len-1)/2*MULT[tier]); }
 function tierOfLen(len){ return len>=9?3 : len>=7?2 : len>=5?1 : 0; }
@@ -2226,6 +2384,10 @@ const Daily = (function(){
     if(hRankEl && hNumEl && s.today && s.today.day===day){
       hNumEl.textContent = rank; hRankEl.style.display = '';
     }
+    const pRankEl=$('profileDailyRank');
+    if(pRankEl && s.today && s.today.day===day){
+      pRankEl.textContent = '#'+rank;
+    }
   }
 
   // WRITE — happens once, when a score is actually being recorded
@@ -2471,8 +2633,8 @@ function renderHome(){
   const homeTag=$('homeTag');
   if(homeTag){
     homeTag.textContent = mode==='classic'
-      ? 'Two letters. Sixty seconds. Stack every word that fits between the buns.'
-      : 'Two letters. One target. Stack every word that fits between the buns.';
+      ? 'Two letters. Sixty seconds. Good words. Taste better.'
+      : 'Two letters. One target. Good words. Taste better.';
   }
 
   const toggleHtml = `
@@ -2548,6 +2710,25 @@ function renderHome(){
     }
 
     $('pastWrap').innerHTML = `<button class="btn ghost sm" onclick="SlowHistory.open()">Past burgers</button>`;
+  }
+}
+
+function renderProfile(){
+  Username.render();
+  Daily.refresh();
+  const s=Store.get();
+  const cachedDaily = (s.rankByDay||{})[Daily.day];
+  $('profileDailyRank').textContent = cachedDaily ? ('#'+cachedDaily) : '#-';
+  if(s.today && s.today.day===Daily.day) Daily.checkRank(Daily.day, s.today.score);
+
+  $('profileWeeklyRank').textContent = '#-';
+  if(LEADERBOARD_URL){
+    fetch(LEADERBOARD_URL+'/leaderboard?day='+encodeURIComponent(Daily.day)+'&period=week&limit=100&deviceId='+encodeURIComponent(visitorId()))
+      .then(r=>r.ok ? r.json() : null).then(data=>{
+        const entries=(data && data.entries)||[];
+        const mine=entries.find(e=>e.isYou);
+        if(mine) $('profileWeeklyRank').textContent = '#'+mine.rank;
+      }).catch(()=>{});
   }
 }
 
@@ -3565,6 +3746,7 @@ $('freeDiff').addEventListener('click', e=>{
   Username.init();
   hapticsOn = !Store.get().hapticsOff;
   go('s-home');
+  if(!seenHowto()) openHowto('s-home');
 
   const st=Store.get();
   let mode='browser';
@@ -3582,61 +3764,25 @@ $('freeDiff').addEventListener('click', e=>{
    How-to overlay, help buttons, and a solved-daily confetti burst.
    ============================================================ */
 (function enhance(){
-  /* ---- How to play overlay ---------------------------------- */
-  const overlay = document.createElement('div');
-  overlay.id = 'howto';
-  overlay.innerHTML =
-    '<div class="howto-card">'+
-      '<h3>How to play</h3>'+
-      '<div class="lead">Two buns. Stack every word that fits between them.</div>'+
-      '<div class="howto-step"><div class="ic">🍞</div><div class="tx"><b>Mind the buns</b>'+
-        '<span>Every word must start with the top letter and end with the bottom letter — both are shown as faint outlines in the box to guide you.</span></div></div>'+
-      '<div class="howto-step"><div class="ic">🔤</div><div class="tx"><b>Three letters or more</b>'+
-        '<span>Tap the built-in keys to build a word, then hit GO. It has to be a real word in the dictionary.</span></div></div>'+
-      '<div class="howto-step"><div class="ic">💎</div><div class="tx"><b>Longer stacks score bigger</b>'+
-        '<span>The longer and rarer the word, the more points and the fancier the ingredient.</span></div></div>'+
-      '<div class="howto-tiers">'+
-        '<div class="t" style="background:linear-gradient(180deg,#C0DE5C,#A3C63F)">3–4<small>LETTUCE</small></div>'+
-        '<div class="t" style="background:linear-gradient(180deg,#E85D40,#D2402A);color:#F7EED9">5–6<small>TOMATO</small></div>'+
-        '<div class="t" style="background:linear-gradient(180deg,#FFC94A,#F6B93B)">7–8<small>CHEESE</small></div>'+
-        '<div class="t" style="background:linear-gradient(180deg,#8A5228,#6B3F1E);color:#F7EED9">9+<small>PATTY</small></div>'+
-      '</div>'+
-      '<button class="btn" id="howtoClose">Let\'s eat</button>'+
-    '</div>';
-  document.body.appendChild(overlay);
-
-  const HELP_KEY = '__wb_seen_howto';
-  function seenHelp(){ try{ return !!localStorage.getItem(HELP_KEY); }catch(e){ return window.__wbHelp; } }
-  function markHelp(){ try{ localStorage.setItem(HELP_KEY,'1'); }catch(e){ window.__wbHelp = true; } }
-  function openHelp(){ overlay.classList.add('on'); }
-  function closeHelp(){ overlay.classList.remove('on'); markHelp(); }
-  window.WBHelp = { open:openHelp, close:closeHelp };
-
-  document.getElementById('howtoClose').addEventListener('click', closeHelp);
-  overlay.addEventListener('click', e=>{ if(e.target===overlay) closeHelp(); });
-
-  /* help button on the home screen */
   function addFab(screenId){
     const s = document.getElementById(screenId);
     if(!s) return;
-    const b = document.createElement('button');
-    b.className='help-fab'; b.type='button'; b.textContent='?';
-    b.setAttribute('aria-label','How to play');
-    b.addEventListener('click', openHelp);
+    const p=document.createElement('button');
+    p.className='profile-pill'; p.type='button'; p.id='profilePill';
+    p.style.visibility='hidden';
+    p.innerHTML='<svg viewBox="0 0 48 48" width="16" height="16"><circle cx="24" cy="17" r="9" fill="currentColor"/><path d="M6 44c0-10 8-16 18-16s18 6 18 16" fill="currentColor"/></svg><span id="profilePillName"></span>';
+    p.setAttribute('aria-label','Your profile');
+    p.addEventListener('click', function(){ go('s-profile'); });
     const t=document.createElement('button');
     t.className='help-fab theme-fab'; t.type='button';
     t.textContent=document.documentElement.classList.contains('light')?'\u263E':'\u2600';
     t.setAttribute('aria-label','Switch light or dark');
     t.addEventListener('click', toggleTheme);
     s.appendChild(t);
-    s.appendChild(b);
+    s.appendChild(p);
   }
-  addFab('s-home');
 
-  /* first visit: pop it open shortly after the splash lifts */
-  if(!seenHelp()){
-    setTimeout(()=>{ if(!seenHelp()) openHelp(); }, 1900);
-  }
+  addFab('s-home');
 
   /* ---- Confetti burst on a solved daily ---------------------- */
   let cvs, ctx, parts=[], raf=0;
