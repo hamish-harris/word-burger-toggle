@@ -678,10 +678,7 @@ body::before{ content:none; display:none; }
    HOME
    ============================================================ */
 .logo-svg{width:min(190px,50vw); height:auto; display:block; margin:0 auto; animation:logoFloat 5s ease-in-out infinite}
-.dark-logo{display:block}
-.light-logo{display:none}
-html.light .dark-logo{display:none}
-html.light .light-logo{display:block}
+/* one vector logo serves both themes; colours come from the --logo-* tokens */
 
 .home-top{padding-top:calc(var(--pad-t) + 44px)}
 
@@ -1426,13 +1423,29 @@ document.addEventListener('DOMContentLoaded', applyThemeChrome);
 </head>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><symbol id="wb-logo" viewBox="0 0 800 618"><rect x="2" y="2" width="796" height="150" rx="70" fill="var(--logo-bun-top,#D6963F)"/>
+<rect x="2" y="168" width="796" height="159" rx="46" fill="var(--logo-bar-word,#EFB735)"/>
+<rect x="2" y="343" width="796" height="166" rx="40" fill="var(--logo-bar-burger,#CE442F)"/>
+<rect x="11" y="523" width="778" height="93" rx="40" fill="var(--logo-bun-bot,#CF9855)"/>
+<ellipse cx="228" cy="81" rx="32" ry="19" fill="var(--logo-seed,#F6EEDC)"/>
+<ellipse cx="396" cy="81" rx="32" ry="19" fill="var(--logo-seed,#F6EEDC)"/>
+<ellipse cx="569" cy="81" rx="32" ry="19" fill="var(--logo-seed,#F6EEDC)"/>
+<path transform="translate(135.00,302.00) scale(0.16566,-0.14971) translate(-5,0)" fill="var(--logo-ink,#2B190C)" stroke="var(--logo-ink,#2B190C)" stroke-width="36.2" stroke-linejoin="round" stroke-linecap="round" d="M166 0 5 688H235L295 394Q297 386 300.0 369.5Q303 353 307.0 333.5Q311 314 314 298H318Q320 307 322.5 319.5Q325 332 327.5 345.0Q330 358 332.5 371.0Q335 384 337 394L396 688H614L677 394Q679 384 682.5 367.0Q686 350 690.0 331.5Q694 313 697 298H701Q703 308 705.5 320.5Q708 333 710.0 346.0Q712 359 714.5 371.5Q717 384 719 394L775 688H995L834 0H591L523 322Q521 335 517.0 352.5Q513 370 509.0 388.0Q505 406 502 419H498Q495 407 491.5 389.5Q488 372 484.0 354.5Q480 337 477 322L409 0Z"/>
+<path transform="translate(307.00,305.00) scale(0.15612,-0.15309) translate(-45,12)" fill="var(--logo-ink,#2B190C)" stroke="var(--logo-ink,#2B190C)" stroke-width="38.4" stroke-linejoin="round" stroke-linecap="round" d="M416 -12Q299 -12 216.0 28.0Q133 68 89.0 147.5Q45 227 45 344Q45 462 89.0 541.0Q133 620 216.0 660.0Q299 700 416 700Q534 700 617.0 660.0Q700 620 744.0 541.0Q788 462 788 344Q788 227 744.0 147.5Q700 68 617.0 28.0Q534 -12 416 -12ZM416 153Q452 153 479.5 164.5Q507 176 525.5 197.0Q544 218 553.0 247.5Q562 277 562 312V376Q562 411 553.0 440.5Q544 470 525.5 491.0Q507 512 479.5 523.5Q452 535 416 535Q380 535 352.5 523.5Q325 512 307.0 491.0Q289 470 280.0 440.5Q271 411 271 376V312Q271 277 280.0 247.5Q289 218 307.0 197.0Q325 176 352.5 164.5Q380 153 416 153Z"/>
+<path transform="translate(441.00,302.00) scale(0.14348,-0.14971) translate(-74,0)" fill="var(--logo-ink,#2B190C)" stroke="var(--logo-ink,#2B190C)" stroke-width="41.8" stroke-linejoin="round" stroke-linecap="round" d="M74 0V688H505Q582 688 633.5 657.0Q685 626 711.0 576.0Q737 526 737 468Q737 402 706.0 350.5Q675 299 622 268L757 0H509L404 231H295V0ZM295 384H450Q476 384 494.0 404.5Q512 425 512 459Q512 480 504.0 496.0Q496 512 482.0 521.5Q468 531 450 531H295Z"/>
+<path transform="translate(558.00,302.00) scale(0.16085,-0.14971) translate(-74,0)" fill="var(--logo-ink,#2B190C)" stroke="var(--logo-ink,#2B190C)" stroke-width="37.3" stroke-linejoin="round" stroke-linecap="round" d="M74 0V688H372Q490 688 570.0 651.0Q650 614 691.5 538.0Q733 462 733 344Q733 227 691.5 150.5Q650 74 570.0 37.0Q490 0 372 0ZM295 165H368Q404 165 430.5 175.0Q457 185 474.0 204.0Q491 223 499.0 251.0Q507 279 507 314V374Q507 409 499.0 437.0Q491 465 474.0 484.0Q457 503 430.5 513.0Q404 523 368 523H295Z"/>
+<path transform="translate(90.00,475.00) scale(0.14157,-0.14535) translate(-74,0)" fill="var(--logo-cream,#F6EFDD)" stroke="var(--logo-cream,#F6EFDD)" stroke-width="42.4" stroke-linejoin="round" stroke-linecap="round" d="M74 0V688H532Q584 688 627.0 666.5Q670 645 696.0 607.0Q722 569 722 519Q722 469 706.0 437.0Q690 405 664.0 386.5Q638 368 607 359V355Q643 347 672.5 327.5Q702 308 720.0 273.0Q738 238 738 183Q738 128 711.0 87.0Q684 46 639.0 23.0Q594 0 538 0ZM295 160H463Q486 160 500.0 176.0Q514 192 514 224Q514 239 507.5 251.5Q501 264 489.5 271.0Q478 278 463 278H295ZM295 420H447Q463 420 474.0 427.5Q485 435 491.5 449.0Q498 463 498 484Q498 506 483.0 521.5Q468 537 447 537H295Z"/>
+<path transform="translate(202.00,477.00) scale(0.13431,-0.14571) translate(-74,12)" fill="var(--logo-cream,#F6EFDD)" stroke="var(--logo-cream,#F6EFDD)" stroke-width="44.7" stroke-linejoin="round" stroke-linecap="round" d="M417 -12Q309 -12 232.5 20.5Q156 53 115.0 117.5Q74 182 74 277V688H295V280Q295 225 325.0 189.0Q355 153 416 153Q477 153 507.5 189.0Q538 225 538 280V688H759V277Q759 182 718.5 117.5Q678 53 601.5 20.5Q525 -12 417 -12Z"/>
+<path transform="translate(315.00,475.00) scale(0.13324,-0.14535) translate(-74,0)" fill="var(--logo-cream,#F6EFDD)" stroke="var(--logo-cream,#F6EFDD)" stroke-width="45.0" stroke-linejoin="round" stroke-linecap="round" d="M74 0V688H505Q582 688 633.5 657.0Q685 626 711.0 576.0Q737 526 737 468Q737 402 706.0 350.5Q675 299 622 268L757 0H509L404 231H295V0ZM295 384H450Q476 384 494.0 404.5Q512 425 512 459Q512 480 504.0 496.0Q496 512 482.0 521.5Q468 531 450 531H295Z"/>
+<path transform="translate(419.00,477.00) scale(0.14091,-0.14266) translate(-41,12)" fill="var(--logo-cream,#F6EFDD)" stroke="var(--logo-cream,#F6EFDD)" stroke-width="42.6" stroke-linejoin="round" stroke-linecap="round" d="M429 -12Q305 -12 218.5 34.0Q132 80 86.5 161.0Q41 242 41 348Q41 432 68.5 500.0Q96 568 148.5 616.5Q201 665 276.5 691.0Q352 717 448 717Q495 717 544.0 709.5Q593 702 644 680Q674 667 686.0 642.5Q698 618 695.0 590.0Q692 562 676.5 539.0Q661 516 634.5 507.0Q608 498 574 512Q549 522 516.5 528.0Q484 534 450 534Q387 534 345.5 513.0Q304 492 284.0 450.5Q264 409 264 348Q264 258 309.5 212.5Q355 167 442 167Q467 167 499.0 172.0Q531 177 565 187L527 110V258H480Q440 258 418.5 277.0Q397 296 397 332Q397 368 418.5 387.0Q440 406 480 406H618Q659 406 680.0 385.0Q701 364 701 323V114Q701 79 686.5 55.0Q672 31 640 20Q591 4 537.5 -4.0Q484 -12 429 -12Z"/>
+<path transform="translate(534.00,475.00) scale(0.11628,-0.14535) translate(-77,0)" fill="var(--logo-cream,#F6EFDD)" stroke="var(--logo-cream,#F6EFDD)" stroke-width="51.6" stroke-linejoin="round" stroke-linecap="round" d="M77 0V688H672V523H298V428H618V270H298V165H679V0Z"/>
+<path transform="translate(624.00,475.00) scale(0.12884,-0.14535) translate(-74,0)" fill="var(--logo-cream,#F6EFDD)" stroke="var(--logo-cream,#F6EFDD)" stroke-width="46.6" stroke-linejoin="round" stroke-linecap="round" d="M74 0V688H505Q582 688 633.5 657.0Q685 626 711.0 576.0Q737 526 737 468Q737 402 706.0 350.5Q675 299 622 268L757 0H509L404 231H295V0ZM295 384H450Q476 384 494.0 404.5Q512 425 512 459Q512 480 504.0 496.0Q496 512 482.0 521.5Q468 531 450 531H295Z"/></symbol></svg>
 <div id="app">
 
   <!-- SPLASH -->
   <div id="splash">
     <div class="sp" id="sp">
-      <img src="/assets/word-burger-logo-final.png" alt="Word Burger" width="800" height="618" class="light-logo" style="width:100%; height:auto">
-      <img src="/assets/word-burger-logo-dark-final.png" alt="Word Burger" width="800" height="618" class="dark-logo" style="width:100%; height:auto">
+      <svg class="wb-logo" viewBox="0 0 800 618" role="img" aria-label="Word Burger" style="width:100%; height:auto; display:block"><use href="#wb-logo"/></svg>
     </div>
   </div>
 
@@ -1451,8 +1464,7 @@ document.addEventListener('DOMContentLoaded', applyThemeChrome);
   <!-- HOME -->
   <section class="screen" id="s-home">
     <div class="home-top">
-      <img class="logo-svg light-logo" src="/assets/word-burger-logo-final.png" alt="Word Burger" width="800" height="618" onclick="go('s-home')" style="cursor:pointer">
-      <img class="logo-svg dark-logo" src="/assets/word-burger-logo-dark-final.png" alt="Word Burger" width="800" height="618" onclick="go('s-home')" style="cursor:pointer">
+      <svg class="logo-svg wb-logo" viewBox="0 0 800 618" role="img" aria-label="Word Burger" onclick="go('s-home')" style="cursor:pointer"><use href="#wb-logo"/></svg>
       <p class="home-tag" id="homeTag">Two letters. Sixty seconds. Good words. Taste better.</p>
     </div>
 
