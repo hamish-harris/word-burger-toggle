@@ -272,15 +272,13 @@ body.locked #app{height:100%}
   padding:8px 14px; margin-bottom:var(--s3); overflow:hidden; position:relative;
 }
 .wb-clear{
-  position:absolute; right:8px; top:50%; transform:translateY(-50%);
-  width:28px; height:28px; border-radius:50%; border:none;
-  background:var(--ketchup); color:var(--cream);
-  font-family:var(--ui); font-size:17px; font-weight:700; line-height:1;
-  display:grid; place-items:center; cursor:pointer;
-  box-shadow:0 2px 0 rgba(0,0,0,.3);
+  position:absolute; right:10px; top:50%; transform:translateY(-50%);
+  width:28px; height:28px; border:none; background:none;
+  color:var(--steel);
+  display:grid; place-items:center; cursor:pointer; padding:0;
   animation:clearPop .18s cubic-bezier(.3,1.4,.5,1) both;
 }
-.wb-clear.bad{background:var(--ketchup-hi,#D9502F)}
+.wb-clear.bad{color:var(--ketchup)}
 .wb-clear:active{transform:translateY(-50%) scale(.92)}
 @keyframes clearPop{from{opacity:0; transform:translateY(-50%) scale(.6)}to{opacity:1; transform:translateY(-50%) scale(1)}}
 .wordbox .ghost{color:#5B4F42; opacity:.55}
@@ -2431,7 +2429,7 @@ function paintBox(boxId, buf, start, end, invalid, clearAction){
   const covered = end && buf[buf.length-1]===end.toLowerCase();
   /* the clear button is available whenever something is typed, not just
      after a rejection — a wrong word is only one of the reasons to start over */
-  const clearBtn = '<button type="button" class="wb-clear'+(invalid?' bad':'')+'" onclick="'+clearAction+'" aria-label="Clear word">×</button>';
+  const clearBtn = '<button type="button" class="wb-clear'+(invalid?' bad':'')+'" onclick="'+clearAction+'" aria-label="Clear word">'+ICON_CLOSE+'</button>';
   el.innerHTML = esc(buf.toUpperCase())+'<span class="caret"></span>'+
     (covered ? '' : '<span class="ghost-us">_</span><span class="ghost">'+e+'</span>') + clearBtn;
 }
