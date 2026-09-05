@@ -687,7 +687,7 @@ body::before{
    ============================================================ */
 .logo-svg{width:min(190px,50vw); height:auto; display:block; margin:0 auto; filter:drop-shadow(0 6px 0 rgba(0,0,0,.28)) drop-shadow(0 12px 22px rgba(0,0,0,.4)); animation:logoFloat 5s ease-in-out infinite}
 
-.home-top{padding-top:1.4vh}
+.home-top{padding-top:calc(var(--pad-t) + 44px)}
 
 .home-tag{margin-top:var(--s4); color:var(--cream-dim); font-size:14px; text-align:center; max-width:288px; margin-inline:auto; line-height:1.5}
 .username-chip{
@@ -1415,15 +1415,15 @@ document.addEventListener('DOMContentLoaded', applyThemeChrome);
   <section class="screen" id="s-home">
     <div class="home-top">
       <svg class="logo-svg" viewBox="0 0 320 180" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Word Burger" onclick="go('s-home')" style="cursor:pointer">
-        <rect x="20" y="10" width="280" height="34" rx="15" fill="#C6975B"/>
-        <ellipse cx="130" cy="27" rx="6" ry="3.5" fill="#F6EEDC"/>
-        <ellipse cx="160" cy="20" rx="6" ry="3.5" fill="#F6EEDC"/>
-        <ellipse cx="190" cy="27" rx="6" ry="3.5" fill="#F6EEDC"/>
-        <rect x="20" y="52" width="280" height="42" rx="12" fill="#E5A72F"/>
-        <text x="160" y="79" text-anchor="middle" dominant-baseline="central" font-family="Fredoka,'Trebuchet MS',sans-serif" font-weight="700" font-size="32" fill="#2E241A">WORD</text>
-        <rect x="20" y="102" width="280" height="42" rx="12" fill="#D94A32"/>
-        <text x="160" y="129" text-anchor="middle" dominant-baseline="central" font-family="Fredoka,'Trebuchet MS',sans-serif" font-weight="700" font-size="29" fill="#F6EEDC">BURGER</text>
-        <rect x="32" y="152" width="256" height="20" rx="10" fill="#C6975B"/>
+        <rect x="50" y="18" width="220" height="34" rx="15" fill="#C6975B"/>
+        <ellipse cx="125" cy="35" rx="6" ry="3.5" fill="#F6EEDC"/>
+        <ellipse cx="160" cy="35" rx="6" ry="3.5" fill="#F6EEDC"/>
+        <ellipse cx="195" cy="35" rx="6" ry="3.5" fill="#F6EEDC"/>
+        <rect x="50" y="58" width="220" height="38" rx="12" fill="#E5A72F"/>
+        <text x="160" y="85" text-anchor="middle" dominant-baseline="central" font-family="Fredoka,'Arial Rounded MT Bold',Arial,sans-serif" font-weight="800" font-size="31" fill="#2E241A">WORD</text>
+        <rect x="50" y="102" width="220" height="38" rx="12" fill="#D94A32"/>
+        <text x="160" y="129" text-anchor="middle" dominant-baseline="central" font-family="Fredoka,'Arial Rounded MT Bold',Arial,sans-serif" font-weight="800" font-size="29" fill="#F6EEDC">BURGER</text>
+        <rect x="62" y="146" width="196" height="20" rx="10" fill="#C6975B"/>
       </svg>
       <p class="home-tag" id="homeTag">Two letters. Sixty seconds. Good words. Taste better.</p>
     </div>
@@ -1668,7 +1668,7 @@ document.addEventListener('DOMContentLoaded', applyThemeChrome);
       </div>
       <div class="howto-row">
         <div class="howto-ic">
-          <svg viewBox="0 0 48 48" width="30" height="30"><path d="M24 8 L36 18 L24 40 L12 18 Z" fill="#7FA8C9"/><path d="M24 8 L36 18 L24 22 Z" fill="#9BC0DE"/><path d="M24 8 L12 18 L24 22 Z" fill="#6C93B5"/></svg>
+          <svg viewBox="0 0 48 48" width="30" height="30"><path d="M8 15l8-9h16l8 9-16 24z" fill="#76957A"/></svg>
         </div>
         <div class="howto-tx">
           <b>Longer stacks score bigger</b>
@@ -1695,7 +1695,7 @@ document.addEventListener('DOMContentLoaded', applyThemeChrome);
       <h2>Your profile</h2>
     </div>
     <div class="profile-avatar">
-      <svg viewBox="0 0 48 48" width="36" height="36"><circle cx="24" cy="17" r="9" fill="currentColor"/><path d="M6 44c0-10 8-16 18-16s18 6 18 16" fill="currentColor"/></svg>
+      <svg viewBox="0 0 48 48" width="36" height="36"><circle cx="24" cy="15" r="8" fill="currentColor"/><path d="M9 40c1-10 7-15 15-15s14 5 15 15z" fill="currentColor"/></svg>
     </div>
     <div class="profile-name-row">
       <span id="profileName">Player</span>
@@ -1880,6 +1880,9 @@ const UMAMI_SRC = "https://cloud.umami.is/script.js";
 /* DAILY LEADERBOARD — paste your deployed Worker URL here to turn this on.
    Leave empty and the game runs exactly as before, no rank shown. */
 const LEADERBOARD_URL = "https://word-burger-leaderboard.hamish-harris.workers.dev";
+const ICON_STREAK = '<svg viewBox="0 0 48 48" width="15" height="15" style="vertical-align:-2px"><path d="M32 4c2 14-8 17-8 27 0 6 4 11 10 11 7 0 12-5 12-12 0-8-6-13-9-19-1 7-4 9-5 10-1-6 1-11 0-17z" fill="#D94A32"/></svg>';
+const ICON_DIAMOND = '<svg viewBox="0 0 48 48" width="15" height="15" style="vertical-align:-2px"><path d="M8 15l8-9h16l8 9-16 24z" fill="#76957A"/></svg>';
+const ICON_TROPHY = '<svg viewBox="0 0 48 48" width="15" height="15" style="vertical-align:-2px"><path d="M10 16h8l4-9 4 9h8l-4 23H14z" fill="#E5A72F"/><circle cx="22" cy="7" r="3" fill="#E5A72F"/></svg>';
 // Target's scores aren't comparable to Classic's (different scoring shape
 // entirely), so they're submitted/ranked under a shifted "day" number -
 // keeps them in a completely separate pool on the same leaderboard.
@@ -2472,9 +2475,9 @@ const Daily = (function(){
         snap.score>=40 ? 'Nice stack' : 'On the board';
       $('drScore').textContent = snap.score;
       $('drFound').textContent = snap.words.length+'/'+pairTotal(snap.start,snap.end);
-      $('drStreak').textContent = '🔥 '+(s.streak||1);
+      $('drStreak').innerHTML = ICON_STREAK+' '+(s.playStreak||1);
       $('drBest').textContent = s.bestScore||snap.score;
-      $('drDiamonds').textContent = '💎 '+snap.words.filter(o=>o.tier===3).length;
+      $('drDiamonds').innerHTML = ICON_DIAMOND+' '+snap.words.filter(o=>o.tier===3).length;
       $('shareBox').textContent = Share.text(snap);
 
       const rankEl=$('drRank'), numEl=$('drRankNum');
@@ -2647,9 +2650,9 @@ function renderHome(){
     const done = s.today && s.today.day===Daily.day;
     const streaks = (s.playStreak||s.played) ? `
       <div class="streaks">
-        <div class="s"><div class="n">🔥 ${s.playStreak||0}</div><div class="l">streak</div></div>
-        <div class="s"><div class="n">${s.bestScore||0}</div><div class="l">best score</div></div>
-        <div class="s"><div class="n">💎 ${s.diamonds||0}</div><div class="l">rare words</div></div>
+        <div class="s"><div class="n">${ICON_STREAK} ${s.playStreak||0}</div><div class="l">streak</div></div>
+        <div class="s"><div class="n">${ICON_TROPHY} ${s.bestScore||0}</div><div class="l">best score</div></div>
+        <div class="s"><div class="n">${ICON_DIAMOND} ${s.diamonds||0}</div><div class="l">rare words</div></div>
       </div>` : '';
 
     $('dailyCard').innerHTML = done ? `
@@ -2681,9 +2684,9 @@ function renderHome(){
     const done = s.slowToday && s.slowToday.day===SlowCook.day;
     const streaks = (s.playStreak||s.slowPlayed) ? `
       <div class="streaks">
-        <div class="s"><div class="n">🔥 ${s.playStreak||0}</div><div class="l">streak</div></div>
-        <div class="s"><div class="n">${s.slowBestScore||0}</div><div class="l">best score</div></div>
-        <div class="s"><div class="n">💎 ${s.slowDiamonds||0}</div><div class="l">rare words</div></div>
+        <div class="s"><div class="n">${ICON_STREAK} ${s.playStreak||0}</div><div class="l">streak</div></div>
+        <div class="s"><div class="n">${ICON_TROPHY} ${s.slowBestScore||0}</div><div class="l">best score</div></div>
+        <div class="s"><div class="n">${ICON_DIAMOND} ${s.slowDiamonds||0}</div><div class="l">rare words</div></div>
       </div>` : '';
 
     $('dailyCard').innerHTML = done ? `
@@ -3108,10 +3111,10 @@ const SlowCook = (function(){
         snap.score>=40 ? 'Nice stack' : 'On the board';
       $('srScore').textContent = snap.score;
       $('srFound').textContent = snap.words.length+'/'+(snap.target||0);
-      $('srStreak').textContent = '🔥 '+(s.slowStreak||1);
+      $('srStreak').innerHTML = ICON_STREAK+' '+(s.playStreak||1);
       $('srBest').textContent = s.slowBestScore||snap.score;
       $('srTime').textContent = timeText(snap.secs||0);
-      $('srDiamonds').textContent = '💎 '+snap.words.filter(o=>o.tier===3).length;
+      $('srDiamonds').innerHTML = ICON_DIAMOND+' '+snap.words.filter(o=>o.tier===3).length;
       $('srShareBox').textContent = SlowShare.text(snap);
 
       const srRankEl=$('srRank'), srNumEl=$('srRankNum');
@@ -3770,7 +3773,7 @@ $('freeDiff').addEventListener('click', e=>{
     const p=document.createElement('button');
     p.className='profile-pill'; p.type='button'; p.id='profilePill';
     p.style.visibility='hidden';
-    p.innerHTML='<svg viewBox="0 0 48 48" width="16" height="16"><circle cx="24" cy="17" r="9" fill="currentColor"/><path d="M6 44c0-10 8-16 18-16s18 6 18 16" fill="currentColor"/></svg><span id="profilePillName"></span>';
+    p.innerHTML='<svg viewBox="0 0 48 48" width="16" height="16"><circle cx="24" cy="15" r="8" fill="currentColor"/><path d="M9 40c1-10 7-15 15-15s14 5 15 15z" fill="currentColor"/></svg><span id="profilePillName"></span>';
     p.setAttribute('aria-label','Your profile');
     p.addEventListener('click', function(){ go('s-profile'); });
     const t=document.createElement('button');
