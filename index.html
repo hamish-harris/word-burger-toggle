@@ -615,6 +615,8 @@ body::before{ content:none; display:none; }
   position:relative; flex-shrink:0;
 }
 
+.btn-play{background:var(--mustard); color:#2E241A}
+
 .btn:active{filter:brightness(.92)}
 
 .btn.sm{font-size:16px; padding:13px 16px}
@@ -1304,6 +1306,7 @@ html.light .sp-top i, html.light .seed{background:#F6EEDC; box-shadow:none}
 html.light .sp-top, html.light .sp-bot{box-shadow:none}
 html.light .sp-burger{color:#FBF6EA}
 html.light .btn{background:#D94A32; color:#FBF6EA; box-shadow:none; border-radius:var(--r-md, 16px)}
+html.light .btn-play{background:#E5A72F; color:#2E241A}
 html.light .btn:active{box-shadow:none; filter:brightness(.95)}
 html.light .btn.ghost{background:transparent; color:#2E241A; box-shadow:none; border:1px solid #D8CEC0}
 html.light .btn.ghost:active{background:rgba(46,36,26,.04)}
@@ -2794,13 +2797,13 @@ function renderHome(){
         <span class="rlb-left">${ICON_TROPHY} #<b id="homeRankNum">-</b> today</span>
         <span class="rlb-right">View leaderboard ${ICON_CHEVRON}</span>
       </button>
-      <button class="btn" onclick="Daily.showResult()">See result and share</button>
+      <button class="btn btn-play" onclick="Daily.showResult()">See result and share</button>
       ${toggleHtml}
       ${streaks}` : `
       <div class="eyebrow">${dateLbl}</div>
       <h2>Daily Burger #${Daily.day+1}</h2>
       <div class="meta">Same two buns for everyone today.<br>Longer, rarer words score more.</div>
-      <button class="btn" onclick="Daily.play()">Play today's burger</button>
+      <button class="btn btn-play" onclick="Daily.play()">Play today's burger</button>
       ${toggleHtml}
       ${streaks}`;
 
@@ -2831,13 +2834,13 @@ function renderHome(){
         <span class="rlb-left">${ICON_TROPHY} #<b id="slowHomeRankNum">-</b> today</span>
         <span class="rlb-right">View leaderboard ${ICON_CHEVRON}</span>
       </button>
-      <button class="btn" onclick="SlowCook.showResult()">See result and share</button>
+      <button class="btn btn-play" onclick="SlowCook.showResult()">See result and share</button>
       ${toggleHtml}
       ${streaks}` : `
       <div class="eyebrow">${dateLbl}</div>
       <h2>Daily Burger #${SlowCook.day+1}</h2>
       <div class="meta">Same two buns for everyone today.<br>Stack every word to hit the target.</div>
-      <button class="btn" onclick="SlowCook.play()">Play today's burger</button>
+      <button class="btn btn-play" onclick="SlowCook.play()">Play today's burger</button>
       ${toggleHtml}
       ${streaks}`;
 
