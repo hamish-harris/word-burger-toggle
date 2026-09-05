@@ -1630,7 +1630,7 @@ document.addEventListener('DOMContentLoaded', applyThemeChrome);
     <div class="countdown" id="countdown">Next burger in <b>--:--:--</b></div>
     <div class="stack" style="margin-top:auto">
       <button class="btn ghost sm" onclick="WordList.open(Store.get().today.words, 's-daily-res')">Show my words</button>
-      <button class="btn ghost sm" onclick="History.open()">Past burgers</button>
+      <button class="btn ghost sm" onclick="History.open('s-daily-res')">Past burgers</button>
       <button class="btn ghost sm" onclick="go('s-home')">Home</button>
     </div>
   </section>
@@ -1638,7 +1638,7 @@ document.addEventListener('DOMContentLoaded', applyThemeChrome);
   <!-- PAST BURGERS -->
   <section class="screen" id="s-history">
     <div class="head">
-      <button class="back" onclick="go('s-home')">‹ Back</button>
+      <button class="back" onclick="History.close()">‹ Back</button>
       <h2>Past burgers</h2>
     </div>
     <div class="tiles">
@@ -1741,7 +1741,7 @@ document.addEventListener('DOMContentLoaded', applyThemeChrome);
 
     <div class="profile-list">
       <button class="profile-row" onclick="Username.openModal()"><span>Edit username</span><span class="chev">›</span></button>
-      <button class="profile-row" onclick="History.open()"><span>Game stats</span><span class="chev">›</span></button>
+      <button class="profile-row" onclick="History.open('s-profile')"><span>Game stats</span><span class="chev">›</span></button>
       <button class="profile-row" onclick="openHowto('s-profile')"><span>How to play</span><span class="chev">›</span></button>
       <button class="profile-row" onclick="Sound.toggle()"><span>Sound</span><span class="chev">›</span></button>
       <button class="profile-row" onclick="go('s-appearance')"><span>Appearance</span><span class="chev">›</span></button>
@@ -2606,6 +2606,7 @@ const Daily = (function(){
    PAST BURGERS — every daily you've stacked, newest first
    ============================================================ */
 const History = (function(){
+  let returnTo = 's-home';
   function dateOf(day){
     return new Date(LAUNCH + day*86400000)
       .toLocaleDateString(undefined,{timeZone:'UTC', weekday:'short', day:'numeric', month:'short'});
@@ -2626,7 +2627,8 @@ const History = (function(){
   }
   return {
     has(){ return rows().length>0; },
-    open(){
+    open(from){
+      returnTo = from || 's-home';
       const s=Store.get(), list=rows();
       const scores=list.map(h=>h.score||0);
       const dia=list.reduce((n,h)=>n+(h.words||[]).filter(o=>o.tier===3).length, 0);
@@ -2653,7 +2655,8 @@ const History = (function(){
       track('history_open', { entries:list.length });
       go('s-history');
     },
-    toggle(i){ const el=$('hx'+i); if(el) el.classList.toggle('open'); }
+    toggle(i){ const el=$('hx'+i); if(el) el.classList.toggle('open'); },
+    close(){ go(returnTo); }
   };
 })();
 
@@ -2766,7 +2769,7 @@ function renderHome(){
       Daily.startHomeRankPolling({day:s.today.day, score:s.today.score});
     }
 
-    $('pastWrap').innerHTML = `<button class="btn ghost sm" onclick="History.open()">Past burgers</button>`;
+    $('pastWrap').innerHTML = `<button class="btn ghost sm" onclick="History.open('s-home')">Past burgers</button>`;
 
   } else {
     const done = s.slowToday && s.slowToday.day===SlowCook.day;
