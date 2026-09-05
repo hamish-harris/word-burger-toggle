@@ -1481,6 +1481,27 @@ html:not(.light) .key.go.cold{ color:#f2e8d6; filter:none; opacity:1 }
 :root{ --logo-bun-top:#dfa963; --logo-bun-bot:#c98944; --logo-bar-word:#d99a2b;
   --logo-bar-burger:#c94a32; --logo-ink:#33241a; --logo-cream:#f6efe0; --logo-seed:#f6efe0 }
 html.light{ --logo-bar-burger:#b23a24 }
+
+/* ---- bun letters: pin the line box so tall display metrics can't push
+   the glyph past the bun's curved edge (worst in pass and play at 36px) ---- */
+.b-bun .let{ line-height:1; display:block }
+.b-top .let{ transform:translateY(1px) }
+.b-bot .let{ transform:translateY(-1px) }
+.pp-bun .let{ font-size:33px }
+
+/* ---- pass countdown: readable in both themes, red as it runs out ---- */
+html.light .pass-countdown{
+  background:#fffdf6; border-color:#d9c9ab; color:#33241a;
+}
+html.light .pass-countdown.urgent{
+  background:var(--ketchup); border-color:var(--ketchup); color:#f6efe0;
+}
+html:not(.light) .pass-countdown{
+  background:rgba(246,236,214,.07); border-color:rgba(242,232,214,.20); color:var(--cream);
+}
+html:not(.light) .pass-countdown.urgent{
+  background:var(--ketchup); border-color:var(--ketchup); color:#f6efe0;
+}
 </style>
 <script>
 function systemPrefersDark(){
