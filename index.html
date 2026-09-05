@@ -7,7 +7,7 @@
 <meta name="description" content="Two letters. Sixty seconds. Stack every word that fits between the buns.">
 <meta property="og:title" content="Word Burger">
 <meta property="og:description" content="Two letters. Sixty seconds. One burger a day.">
-<meta name="theme-color" content="#17120E">
+<meta name="theme-color" content="#F6EEDC">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
@@ -1399,15 +1399,9 @@ try{
 function applyThemeChrome(){
   const light=document.documentElement.classList.contains('light');
   const tc=document.querySelector('meta[name="theme-color"]');
-  if(tc) tc.setAttribute('content', light?'#F6EEDC':'#17120E');
+  if(tc) tc.setAttribute('content', light?'#F6EEDC':'#1C1916');
   const sb=document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
   if(sb) sb.setAttribute('content', light?'default':'black');
-  const map={dark:{"#C6975B":"#D89A4E","#F6EEDC":"#F6ECD6","#E5A72F":"#F2A81D","#2E241A":"#17120E","#D94A32":"#C63D26"},
-             light:{"#D89A4E":"#C6975B","#F6ECD6":"#F6EEDC","#F2A81D":"#E5A72F","#17120E":"#2E241A","#C63D26":"#D94A32"}};
-  const m=light?map.light:map.dark;
-  document.querySelectorAll('.logo-svg [fill]').forEach(el=>{
-    const f=el.getAttribute('fill'); if(m[f]) el.setAttribute('fill', m[f]);
-  });
   const tf=document.querySelector('.theme-fab');
   if(tf) tf.textContent=light?'\u263E':'\u2600';
   if(typeof renderAppearance==='function') renderAppearance();
@@ -1457,18 +1451,7 @@ document.addEventListener('DOMContentLoaded', applyThemeChrome);
   <!-- HOME -->
   <section class="screen" id="s-home">
     <div class="home-top">
-      <svg class="logo-svg" viewBox="0 0 360 260" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Word Burger" onclick="go('s-home')" style="cursor:pointer">
-        <!-- LOCKED MASTER: rendered as one asset; do not reconstruct -->
-        <rect x="48" y="30" width="264" height="55" rx="20" fill="#C6975B"/>
-        <ellipse cx="135" cy="57.5" rx="7.5" ry="4.5" fill="#F6EEDC"/>
-        <ellipse cx="180" cy="57.5" rx="7.5" ry="4.5" fill="#F6EEDC"/>
-        <ellipse cx="225" cy="57.5" rx="7.5" ry="4.5" fill="#F6EEDC"/>
-        <rect x="48" y="92" width="264" height="55" rx="16" fill="#E5A72F"/>
-        <text x="180" y="130" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="42" font-weight="900" letter-spacing="-1.5" fill="#2E241A">WORD</text>
-        <rect x="48" y="154" width="264" height="55" rx="16" fill="#D94A32"/>
-        <text x="180" y="192" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="39" font-weight="900" letter-spacing="-1" fill="#F6EEDC">BURGER</text>
-        <rect x="60" y="216" width="240" height="28" rx="14" fill="#C6975B"/>
-      </svg>
+      <img class="logo-svg" src="/assets/word-burger-logo-final.png" alt="Word Burger" width="800" height="618" onclick="go('s-home')" style="cursor:pointer">
       <p class="home-tag" id="homeTag">Two letters. Sixty seconds. Good words. Taste better.</p>
     </div>
 
