@@ -1380,6 +1380,17 @@ html.light .username-chip{background:transparent; border:1px solid #D8CEC0; colo
 html.light #usernameModal{background:rgba(46,36,26,.4)}
 html.light #usernameInput{background:#FFFDF7; color:#2E241A; border:1px solid #D8CEC0}
 html.light #usernameInput:focus{border-color:#D94A32}
+
+/* free play difficulty: a chef's-hat rating filling the middle of the screen */
+.diff-stage{flex:1; min-height:0; display:flex; flex-direction:column; align-items:center;
+  justify-content:center; padding:var(--s5) 0 var(--s4)}
+.diff-hats{display:flex; gap:14px; align-items:flex-end}
+.diff-hats .slot{width:48px; height:56px; color:var(--cream); transition:opacity .22s ease, transform .22s ease}
+.diff-hats .slot svg{width:100%; height:100%; display:block}
+.diff-hats .slot.off{opacity:.14; transform:scale(.9)}
+.diff-cap{margin-top:var(--s4); text-align:center}
+.diff-cap .nm{font-family:var(--display); font-weight:800; font-size:19px; color:var(--cream)}
+.diff-cap .sb{font-size:12.5px; color:var(--steel); margin-top:5px; line-height:1.5; max-width:290px}
 </style>
 <script>
 function systemPrefersDark(){
@@ -1489,6 +1500,14 @@ document.addEventListener('DOMContentLoaded', applyThemeChrome);
       <h2>Free play</h2>
     </div>
     <p class="sub">Unlimited practice rounds. Sixty seconds on the clock. Letters reveal the moment you start.</p>
+
+    <div class="diff-stage">
+      <div class="diff-hats" id="freeHats"></div>
+      <div class="diff-cap">
+        <div class="nm" id="freeDiffName">Medium</div>
+        <div class="sb" id="freeDiffNote"></div>
+      </div>
+    </div>
 
     <div style="margin-top:var(--s6)">
       <div class="label">Difficulty</div>
@@ -1966,6 +1985,7 @@ const UMAMI_SRC = "https://cloud.umami.is/script.js";
 const LEADERBOARD_URL = "https://word-burger-leaderboard.hamish-harris.workers.dev";
 const ICON_STREAK = '<svg viewBox="0 0 48 48" width="24" height="24" style="vertical-align:-4px"><path d="M32 4c2 14-8 17-8 27 0 6 4 11 10 11 7 0 12-5 12-12 0-8-6-13-9-19-1 7-4 9-5 10-1-6 1-11 0-17z" fill="#D94A32"/></svg>';
 const ICON_DIAMOND = '<svg viewBox="0 0 48 48" width="24" height="24" style="vertical-align:-4px"><path d="M8 15l8-9h16l8 9-16 24z" fill="#76957A"/></svg>';
+const ICON_CHEF = '<svg viewBox="0 0 48 56" width="48" height="56" fill="currentColor"><path d="M14 48h20v-4H14v4z"/><path d="M24 4a9 9 0 0 0-8.6 6.4A8 8 0 0 0 8 26v14h32V26a8 8 0 0 0-7.4-15.6A9 9 0 0 0 24 4z"/></svg>';
 const ICON_TROPHY = '<svg viewBox="0 0 48 48" width="24" height="24" style="vertical-align:-4px"><path d="M10 16h8l4-9 4 9h8l-4 23H14z" fill="#E5A72F"/><circle cx="22" cy="7" r="3" fill="#E5A72F"/></svg>';
 const ICON_BACK = '<svg viewBox="0 0 48 48" width="24" height="24" style="vertical-align:-5px"><path d="M31 8L15 24l16 16" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const ICON_CHEVRON = '<svg viewBox="0 0 48 48" width="24" height="24" style="vertical-align:-4px"><path d="M18 9l15 15-15 15" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
@@ -3797,12 +3817,29 @@ $('ppDiff').addEventListener('click', e=>{
   PP.setDifficulty(b.dataset.d);
 });
 
+const DIFF_COPY = {
+  easy:   {hats:1, nm:'Easy',   sb:'Common pairs. Over 150 words are in there \u2014 room to stack it high.'},
+  medium: {hats:2, nm:'Medium', sb:'Between 50 and 150 words. A proper burger if you work for it.'},
+  hard:   {hats:3, nm:'Hard',   sb:'Fewer than 50 words exist for these letters. Every find counts.'}
+};
+function paintDifficulty(d){
+  const c = DIFF_COPY[d] || DIFF_COPY.medium;
+  const stage = $('freeHats');
+  if(stage) stage.innerHTML = [1,2,3].map(i =>
+    '<div class="slot' + (i <= c.hats ? '' : ' off') + '">' + ICON_CHEF + '</div>').join('');
+  const nm = $('freeDiffName'), sb = $('freeDiffNote');
+  if(nm) nm.textContent = c.nm;
+  if(sb) sb.textContent = c.sb;
+}
+
 $('freeDiff').addEventListener('click', e=>{
   const b=e.target.closest('button'); if(!b) return;
   document.querySelectorAll('#freeDiff button').forEach(x=>x.classList.remove('on'));
   b.classList.add('on');
   Free.setDifficulty(b.dataset.d);
+  paintDifficulty(b.dataset.d);
 });
+paintDifficulty(document.querySelector('#freeDiff button.on')?.dataset.d || 'medium');
 
 /* ============================================================
    BOOT
