@@ -1868,7 +1868,7 @@ document.addEventListener('DOMContentLoaded', applyThemeChrome);
 
     <div class="profile-list">
       <button class="profile-row" onclick="Username.openModal()"><span>Edit username</span><span class="chev">›</span></button>
-      <button class="profile-row" onclick="History.open('s-profile')"><span>Game stats</span><span class="chev">›</span></button>
+      <button class="profile-row" onclick="PastBurgers.open()"><span>Past burgers</span><span class="chev">›</span></button>
       <button class="profile-row" onclick="openHowto('s-profile')"><span>How to play</span><span class="chev">›</span></button>
       <button class="profile-row" onclick="Sound.toggle()"><span>Sound</span><span class="chev">›</span></button>
       <button class="profile-row" onclick="go('s-appearance')"><span>Appearance</span><span class="chev">›</span></button>
@@ -1918,7 +1918,7 @@ document.addEventListener('DOMContentLoaded', applyThemeChrome);
   <!-- SLOW COOK: PAST BURGERS -->
   <section class="screen" id="s-slow-history">
     <div class="head">
-      <button class="back" onclick="go('s-home')">‹ Back</button>
+      <button class="back" onclick="go(shxReturnTo)">‹ Back</button>
       <h2>Past burgers</h2>
     </div>
     <div class="tiles">
@@ -2790,6 +2790,7 @@ const History = (function(){
   };
 })();
 
+let shxReturnTo='s-home';
 const SlowHistory = (function(){
   function dateOf(day){
     return new Date(LAUNCH + day*86400000)
@@ -2810,7 +2811,8 @@ const SlowHistory = (function(){
   }
   return {
     has(){ return rows().length>0; },
-    open(){
+    open(from){
+      shxReturnTo = from || 's-home';
       const s=Store.get(), list=rows();
       const scores=list.map(h=>h.score||0);
       const dia=list.reduce((n,h)=>n+(h.words||[]).filter(o=>o.tier===3).length, 0);
@@ -2844,6 +2846,18 @@ const SlowHistory = (function(){
 /* ============================================================
    HOME
    ============================================================ */
+
+/* Past burgers lives in the profile menu now; open whichever mode is active
+   so Target players see their own history rather than Classic's. */
+const PastBurgers={
+  open(){
+    let mode='classic';
+    try{ mode=(Store.get().dailyMode)||'classic'; }catch(e){}
+    if(mode==='slow' && typeof SlowHistory!=='undefined'){ SlowHistory.open('s-profile'); }
+    else { History.open('s-profile'); }
+  }
+};
+
 function renderHome(){
   Daily.refresh();
   SlowCook.refresh();
@@ -2899,7 +2913,7 @@ function renderHome(){
       Daily.startHomeRankPolling({day:s.today.day, score:s.today.score});
     }
 
-    $('pastWrap').innerHTML = `<button class="btn ghost sm" onclick="History.open('s-home')">Past burgers</button>`;
+    $('pastWrap').innerHTML = '';
 
   } else {
     const done = s.slowToday && s.slowToday.day===SlowCook.day;
@@ -2936,7 +2950,7 @@ function renderHome(){
       SlowCook.startHomeRankPolling({day:s.slowToday.day, score:s.slowToday.score});
     }
 
-    $('pastWrap').innerHTML = `<button class="btn ghost sm" onclick="SlowHistory.open()">Past burgers</button>`;
+    $('pastWrap').innerHTML = '';
   }
 }
 
