@@ -274,12 +274,13 @@ body.locked #app{height:100%}
 .wb-clear{
   position:absolute; right:8px; top:50%; transform:translateY(-50%);
   width:28px; height:28px; border-radius:50%; border:none;
-  background:var(--ketchup); color:var(--cream);
+  background:rgba(246,236,214,.14); color:var(--cream);
   font-family:var(--ui); font-size:17px; font-weight:700; line-height:1;
   display:grid; place-items:center; cursor:pointer;
   box-shadow:0 2px 0 rgba(0,0,0,.3);
   animation:clearPop .18s cubic-bezier(.3,1.4,.5,1) both;
 }
+.wb-clear.bad{background:var(--ketchup)}
 .wb-clear:active{transform:translateY(-50%) scale(.92)}
 @keyframes clearPop{from{opacity:0; transform:translateY(-50%) scale(.6)}to{opacity:1; transform:translateY(-50%) scale(1)}}
 .wordbox .ghost{color:#5B4F42; opacity:.55}
@@ -334,10 +335,12 @@ body.locked #app{height:100%}
 .key.act::before{background:var(--panel)}
 .key.act.popped::before{background:var(--ketchup)}
 .key.act.popped{color:var(--cream)}
-.key.go{flex:1 1 auto; height:50px; font-size:19px; letter-spacing:.06em; color:#F6EEDC}
+.key.go{flex:1 1 auto; height:50px; font-size:19px; letter-spacing:.06em; color:#F6EEDC; transition:color .16s ease}
+.go::before{transition:background .16s ease, border-color .16s ease}
 .key.go::before{background:var(--go); border-color:var(--go); box-shadow:none}
 .key.go.popped::before{box-shadow:0 0 0}
-.key.go.cold{filter:saturate(.35) brightness(.75)}
+.key.go.cold::before{background:var(--panel-hi); border-color:var(--line)}
+.go.cold{color:var(--steel)}
 .krow .spacer{flex:0 0 var(--kw); visibility:hidden}
 .krow.krow-last{margin-top:1px}
 .key:disabled{opacity:.3; pointer-events:none}
@@ -1335,7 +1338,7 @@ html.light .key::before{background:transparent; border-color:#D8CEC0; box-shadow
 html.light .key:active::before, html.light .key.popped::before{background:#E5A72F; box-shadow:none}
 html.light .key .pop{background:#2E241A; color:#FBF6EA; box-shadow:0 4px 12px rgba(46,36,26,.2)}
 html.light .key.act.popped{color:#FBF6EA}
-html.light .key.go.cold{filter:none; opacity:.4}
+html.light .key.go.cold{opacity:1}
 html.light .layer{box-shadow:none; border-bottom:1px solid rgba(46,36,26,.08)}
 html.light .ing0{background:#76957A}
 html.light .ing1{background:#D94A32; color:#FBF6EA}
@@ -2423,7 +2426,9 @@ function paintBox(boxId, buf, start, end, invalid, clearAction){
     return;
   }
   const covered = end && buf[buf.length-1]===end.toLowerCase();
-  const clearBtn = invalid ? '<button type="button" class="wb-clear" onclick="'+clearAction+'" aria-label="Clear word">×</button>' : '';
+  /* the clear button is available whenever something is typed, not just
+     after a rejection — a wrong word is only one of the reasons to start over */
+  const clearBtn = '<button type="button" class="wb-clear'+(invalid?' bad':'')+'" onclick="'+clearAction+'" aria-label="Clear word">×</button>';
   el.innerHTML = esc(buf.toUpperCase())+'<span class="caret"></span>'+
     (covered ? '' : '<span class="ghost-us">_</span><span class="ghost">'+e+'</span>') + clearBtn;
 }
