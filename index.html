@@ -502,10 +502,17 @@ body.locked #app{height:100%}
   background:rgba(10,7,4,.7); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px)}
 #usernameModal.on{display:flex; animation:fadeIn .25s both}
 #usernameInput{
-  width:100%; margin-top:14px; font-family:var(--ui); font-size:16px; color:var(--cream);
+  width:100%; margin-top:0; font-family:var(--ui); font-size:16px; color:var(--cream);
   background:var(--panel); border:1px solid var(--line); border-radius:11px;
-  padding:12px 14px; outline:none;
+  padding:12px 40px 12px 14px; outline:none;
 }
+.input-wrap{position:relative; margin-top:14px}
+.in-clear{
+  position:absolute; right:8px; top:50%; transform:translateY(-50%);
+  width:30px; height:30px; border:none; background:none; color:var(--steel);
+  display:grid; place-items:center; cursor:pointer; padding:0;
+}
+.in-clear:active{transform:translateY(-50%) scale(.92)}
 #usernameInput:focus{border-color:var(--mustard)}
 #usernameError{color:var(--ketchup); font-size:12px; text-align:center; min-height:16px; margin-top:8px}
 .modal-close-x{position:absolute; top:14px; right:14px; background:none; border:none; color:var(--steel); padding:4px; cursor:pointer; line-height:0}
@@ -1755,7 +1762,10 @@ document.addEventListener('DOMContentLoaded', applyThemeChrome);
       <button class="modal-close-x" onclick="Username.closeModal()" aria-label="Close">×</button>
       <h3>Choose a username</h3>
       <p class="lead">This is how you'll appear on the daily leaderboard.</p>
-      <input type="text" id="usernameInput" maxlength="24" placeholder="e.g. BunMaster" autocomplete="off">
+      <div class="input-wrap">
+        <input type="text" id="usernameInput" maxlength="24" placeholder="e.g. BunMaster" autocomplete="off">
+        <button type="button" class="in-clear" id="usernameClear" onclick="Username.clearInput()" aria-label="Clear username" style="display:none"></button>
+      </div>
       <div id="usernameError"></div>
       <button class="btn" onclick="Username.save()" style="margin-top:14px">Save</button>
     </div>
@@ -2420,11 +2430,34 @@ const Username = (function(){
     const profileName = $('profileName');
     if(profileName) profileName.textContent = current;
   }
+  /* The X only appears when there's something to clear - a permanently
+     visible one on an empty field is just clutter. */
+  function paintClear(){
+    const input=$('usernameInput'), btn=$('usernameClear');
+    if(!input || !btn) return;
+    btn.innerHTML = ICON_CLOSE;
+    btn.style.display = input.value.length ? 'grid' : 'none';
+  }
+  function clearInput(){
+    const input=$('usernameInput');
+    if(!input) return;
+    input.value='';
+    $('usernameError').textContent='';
+    paintClear();
+    input.focus();
+  }
   function openModal(){
     const input=$('usernameInput');
     input.value = current || '';
     $('usernameError').textContent = '';
     $('usernameModal').classList.add('on');
+    // bind here rather than at module scope: this script runs before the
+    // markup exists, so an early listener would attach to nothing
+    if(!input.dataset.clearBound){
+      input.addEventListener('input', paintClear);
+      input.dataset.clearBound = '1';
+    }
+    paintClear();
     setTimeout(()=>input.focus(), 50);
   }
   function closeModal(){
@@ -2458,7 +2491,7 @@ const Username = (function(){
       errEl.textContent = 'Network error. Try again.';
     }
   }
-  return { init, openModal, closeModal, save, render };
+  return { init, openModal, closeModal, save, render, clearInput };
 })();
 
 /* Device transfer: move a player's identity (username, scores, local streak
