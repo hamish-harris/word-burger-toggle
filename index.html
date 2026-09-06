@@ -1643,6 +1643,43 @@ html.light .names input{background:#FFFDF7; color:#2E241A}
   font-size:13px; font-weight:700;
 }
 .key.go{ text-transform:uppercase; letter-spacing:.08em }
+
+/* Slow Cook has no clock, so the pair sits alone and the target bar
+   becomes the main indicator: thicker, rounder, and given room. */
+#s-slow-play .slow-head{
+  display:flex; justify-content:flex-end; align-items:center;
+  margin-top:var(--s3);
+}
+#s-slow-play .slow-head .order{
+  font-family:var(--display); font-weight:700; font-size:15px;
+  letter-spacing:.08em; color:var(--cream);
+}
+#s-slow-play .progress{ margin:var(--s3) 0 var(--s4); gap:var(--s3) }
+#s-slow-play .progress .bar{ height:16px; border-radius:99px; overflow:hidden }
+#s-slow-play .progress .fill{ border-radius:99px; transition:width .35s cubic-bezier(.3,.9,.3,1) }
+#s-slow-play .progress .num{ font-size:14px }
+
+/* Target bar mirrors the Classic timer track: same gradient, same notches. */
+#s-slow-play .progress .bar{
+  position:relative; overflow:hidden;
+  background:#e8dcc0; border:1px solid #d9c9ab;
+}
+html:not(.light) #s-slow-play .progress .bar{
+  background:#2c2016; border:1px solid rgba(242,232,214,.16);
+}
+#s-slow-play .progress .fill{
+  background:linear-gradient(90deg,#b23a24,#d99a2b);
+}
+html:not(.light) #s-slow-play .progress .fill{
+  background:linear-gradient(90deg,#c94a32,#d99a2b);
+}
+#s-slow-play .progress .segs{
+  position:absolute; inset:0; display:flex; pointer-events:none; opacity:.3;
+}
+#s-slow-play .progress .segs i{
+  flex:1; border-right:2px solid var(--griddle);
+}
+html.light #s-slow-play .progress .segs i{ border-right-color:#f6efe0 }
 </style>
 <script>
 function systemPrefersDark(){
@@ -1869,21 +1906,13 @@ document.addEventListener('DOMContentLoaded', applyThemeChrome);
       </div>
     </div>
 
-    <div class="timer">
-      <div class="timer-head">
-        <span class="secs" id="slowSecs">0:00</span>
-        <span class="order" id="slowOrder">A → D</span>
-      </div>
-      <div class="track">
-        <div class="grad"></div>
-        <div class="mask" id="slowMask"></div>
-        <div class="ticks"></div>
-        <div class="knob" id="slowKnob"></div>
-      </div>
+    <div class="slow-head">
+      <span class="order" id="slowOrder">A → D</span>
+      <span class="secs" id="slowSecs" hidden>0:00</span>
     </div>
 
     <div class="progress">
-      <div class="bar"><div class="fill" id="slowProgFill" style="width:0"></div></div>
+      <div class="bar"><div class="fill" id="slowProgFill" style="width:0"></div><div class="segs" id="slowProgSegs"></div></div>
       <span class="num"><b id="slowFoundN">0</b>/<span id="slowTotalN">0</span> target</span>
     </div>
 
@@ -2852,6 +2881,16 @@ function reportRejects(list, day){
       body:JSON.stringify({words:words, day:day|0, deviceId:visitorId()}),
       keepalive:true}).catch(function(){});
   }catch(e){}
+}
+
+
+/* One notch per word needed, so the bar reads as a count rather than a
+   vague percentage. Mirrors the ticks the Classic timer track uses. */
+function paintSlowSegs(target){
+  const el=$('slowProgSegs'); if(!el) return;
+  const n=Math.max(0, Math.min(40, target|0));
+  el.innerHTML = n>1 ? new Array(n-1).fill('<i></i>').join('') : '';
+  el.style.setProperty('--segs', n||1);
 }
 
 function check(w, start, end, used){
@@ -4184,6 +4223,7 @@ const SlowRound = (function(){
       $('slowScore').innerHTML = '0 <span class="u">pts</span>';
       $('slowFills').innerHTML = '<div class="hint">Buns are ready. Start stacking.</div>';
       $('slowTotalN').textContent = st.target;
+      paintSlowSegs(st.target);
       $('slowFoundN').textContent = '0';
       $('slowProgFill').style.width='0';
       paintTimer('slow', 0, '0:00', false);
@@ -4214,6 +4254,7 @@ const SlowRound = (function(){
       if(!st.words.length) $('slowFills').innerHTML = '<div class="hint">Buns are ready. Start stacking.</div>';
       paintScoreS();
       $('slowTotalN').textContent = st.target;
+      paintSlowSegs(st.target);
       paintProgressS();
       paintTimer('slow', st.words.length/st.target, clockText(Math.floor(st.elapsed)), false);
       resetQuitS();
