@@ -1306,6 +1306,12 @@ body::before{ content:none; display:none; }
 .help-fab, .profile-pill{ top:var(--pad-t); height:32px; box-sizing:border-box }
 .help-fab{ display:grid; place-items:center; padding:0 }
 .help-fab svg{ display:block }
+
+/* quiet note at the foot of How to play */
+.howto-fineprint{
+  margin:var(--s4) auto 0; max-width:320px; text-align:center;
+  font-size:11px; line-height:1.55; color:var(--steel); opacity:.85;
+}
 </style>
 <style id="atomic-icons">
 .at-ic{width:1.05em;height:1.05em;display:inline-block;vertical-align:-0.14em;margin-right:2px}
@@ -1938,6 +1944,9 @@ document.addEventListener('DOMContentLoaded', applyThemeChrome);
     </div>
 
     <button class="btn" onclick="exitHowto()" style="margin-top:var(--s5)">Let's eat</button>
+
+    <p class="howto-fineprint">If you try a word we don't have, we make a note of the word
+    itself so we can improve the dictionary. Nothing else about you is collected.</p>
   </section>
 
   <!-- PROFILE -->
