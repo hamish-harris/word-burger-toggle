@@ -710,6 +710,17 @@ body::before{ content:none; display:none; }
 
 .home-tag{margin-top:var(--s4); color:var(--cream-dim); font-size:14px; text-align:center; max-width:288px; margin-inline:auto; line-height:1.5}
 
+.warn-wrap{flex:1; display:flex; align-items:center; justify-content:center; padding:var(--s4) 0}
+.warn-card{max-width:320px; text-align:center}
+.warn-title{font-family:var(--display); font-weight:800; font-size:22px; color:var(--cream)}
+.warn-body{color:var(--steel); font-size:14px; line-height:1.55; margin-top:var(--s3)}
+.cd-wrap{text-align:center}
+.cd-label{font-family:var(--display); font-weight:700; font-size:15px; color:var(--steel);
+  text-transform:uppercase; letter-spacing:.14em}
+.cd-num{font-family:var(--display); font-weight:800; font-size:96px; line-height:1.1;
+  color:var(--mustard); margin-top:var(--s3)}
+.cd-num.go{color:var(--go, #3F9851); font-size:60px}
+
 .moved-notice{
   margin:var(--s4) auto 0; max-width:320px; text-align:center;
   border:1px solid var(--line-hi); border-radius:var(--r-md);
@@ -1777,6 +1788,30 @@ document.addEventListener('DOMContentLoaded', applyThemeChrome);
   </section>
 
   <!-- PLAY -->
+  <section class="screen" id="s-warn">
+    <div class="warn-wrap">
+      <div class="warn-card">
+        <div class="warn-title">Before you start</div>
+        <p class="warn-body">Your 60 seconds begin as soon as the letters appear, and the clock keeps running whether or not the game is open.</p>
+        <p class="warn-body">There's no pausing, and one go per day.</p>
+        <div class="stack" style="margin-top:var(--s5)">
+          <button class="btn btn-play" onclick="Countdown.start()">Let's go</button>
+          <button class="btn ghost sm" onclick="go('s-home')">Not ready</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="screen" id="s-countdown">
+    <div class="warn-wrap">
+      <div class="cd-wrap">
+        <div class="cd-label">Firing up the grill</div>
+        <div class="cd-num" id="cdNum">3</div>
+        <button class="btn ghost sm" id="cdBail" onclick="Countdown.cancel()" style="max-width:200px; margin:var(--s5) auto 0">Not ready</button>
+      </div>
+    </div>
+  </section>
+
   <section class="screen" id="s-play">
     <div class="hud">
       <div class="hud-side">
@@ -3037,6 +3072,42 @@ function recordPlayStreak(s, day){
   s.playLastDay = day;
 }
 
+/* Between committing and the clock starting. The countdown is short because
+   the decision is already made - but it keeps a Not ready button, since
+   people past their first play never see the warning screen and still
+   deserve a way out. */
+const Countdown = (function(){
+  let timer=null, n=3;
+  function stop(){ if(timer){ clearInterval(timer); timer=null; } }
+  return {
+    start(){
+      stop(); n=3;
+      const el=$('cdNum'), bail=$('cdBail');
+      el.textContent=n; el.classList.remove('go');
+      if(bail) bail.style.visibility='visible';
+      go('s-countdown');
+      Sound.ensure();
+      timer=setInterval(()=>{
+        n--;
+        if(n>0){
+          el.textContent=n; el.classList.remove('go');
+          Sound.bell(1,.35);
+        } else if(n===0){
+          // past the point of no return - hide the bail-out so it can't be
+          // tapped in the same instant the round begins
+          el.textContent='GO'; el.classList.add('go');
+          if(bail) bail.style.visibility='hidden';
+          Sound.bell(2,.5);
+        } else {
+          stop();
+          Daily.launch();
+        }
+      }, 800);
+    },
+    cancel(){ stop(); go('s-home'); }
+  };
+})();
+
 const Daily = (function(){
   function dayNumber(){
     const n=new Date();
@@ -3140,10 +3211,29 @@ const Daily = (function(){
       const s=Store.get();
       if(s.today && s.today.day===this.day){ renderHome(); go('s-home'); return; }
 
-      /* The clock runs from the moment the letters are first shown, and keeps
-         running whether or not the game is open. Otherwise you could look at
-         the buns, leave, think of words at leisure, and come back to a fresh
-         60 seconds. */
+      /* Resuming a round already under way - the clock never stopped, so
+         there's nothing to warn about and no countdown to run. */
+      if(s.dailyLive && s.dailyLive.day===this.day){ this.launch(); return; }
+
+      /* The warning earns its place once. After that it's daily friction on
+         a habit game, so the countdown's Not ready button carries the
+         get-out instead. */
+      let warned=false;
+      try{ warned = localStorage.getItem('wordburger.warnedTimer')==='1'; }catch(e){}
+      if(!warned){
+        try{ localStorage.setItem('wordburger.warnedTimer','1'); }catch(e){}
+        go('s-warn');
+        return;
+      }
+      Countdown.start();
+    },
+
+    /* Starts the clock. Everything above this point is reversible; this
+       isn't. */
+    launch(){
+      const s=Store.get();
+      if(s.today && s.today.day===this.day){ renderHome(); go('s-home'); return; }
+
       const now = Date.now();
       let live = s.dailyLive;
       if(!live || live.day!==this.day){
