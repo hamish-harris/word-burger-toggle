@@ -2031,7 +2031,7 @@ document.addEventListener('DOMContentLoaded', applyThemeChrome);
       <button class="profile-row" onclick="openHowto('s-profile')"><span>How to play</span><span class="chev">›</span></button>
       <button class="profile-row" onclick="Sound.toggle()"><span>Sound</span><span class="row-state" id="soundState">On</span></button>
       <button class="profile-row" onclick="go('s-appearance')"><span>Appearance</span><span class="chev">›</span></button>
-      <button class="profile-row" onclick="Transfer.openScreen()"><span>Move to a new device</span><span class="chev">›</span></button>
+      <button class="profile-row" onclick="Transfer.openScreen()"><span>Move or link your progress</span><span class="chev">›</span></button>
     </div>
   </section>
 
@@ -2039,13 +2039,13 @@ document.addEventListener('DOMContentLoaded', applyThemeChrome);
   <section class="screen" id="s-transfer">
     <div class="head">
       <button class="back" onclick="go('s-profile')">‹</button>
-      <h2>Move to a new device</h2>
+      <h2>Move your progress</h2>
     </div>
-    <p class="sub">Your name, streak and scores live on this device. Move them over when you switch phone or browser.</p>
+    <p class="sub">Your name, streak and scores are saved on this device only. Use a code to move them to another device, or to link your app and browser so they share one account.</p>
 
     <div class="tx-block">
-      <div class="rule">Take it with you</div>
-      <p class="tx-lead">Generate a code here, then enter it on your new device.</p>
+      <div class="rule">Send to another device</div>
+      <p class="tx-lead">Generate a code here, then enter it on the other device.</p>
       <div class="tc-code" id="tcCode">····-····</div>
       <div class="duo" style="margin-top:10px">
         <button class="btn ghost sm" onclick="Transfer.create()" id="tcMakeBtn">Get a code</button>
@@ -2056,7 +2056,7 @@ document.addEventListener('DOMContentLoaded', applyThemeChrome);
     </div>
 
     <div class="tx-block">
-      <div class="rule">Bring it here</div>
+      <div class="rule">Bring progress here</div>
       <p class="tx-lead">Already have a code from your other device?</p>
       <input type="text" id="tClaimInput" maxlength="9" placeholder="XXXX-XXXX" autocomplete="off" autocapitalize="characters" spellcheck="false">
       <div id="tClaimConfirm" style="display:none">
