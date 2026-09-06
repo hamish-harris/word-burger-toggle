@@ -1232,6 +1232,8 @@ body::before{ content:none; display:none; }
 }
 .profile-row:last-child{border-bottom:1px solid var(--line)}
 .profile-row .chev{color:var(--steel); font-size:16px}
+.profile-row .row-state{color:var(--steel); font-size:15px; font-weight:600}
+.profile-row .row-state.off{opacity:.6}
 
 /* APPEARANCE */
 .appear-list{display:flex; flex-direction:column; gap:10px}
@@ -1970,7 +1972,7 @@ document.addEventListener('DOMContentLoaded', applyThemeChrome);
       <button class="profile-row" onclick="Username.openModal()"><span>Edit username</span><span class="chev">›</span></button>
       <button class="profile-row" onclick="PastBurgers.open()"><span>Past burgers</span><span class="chev">›</span></button>
       <button class="profile-row" onclick="openHowto('s-profile')"><span>How to play</span><span class="chev">›</span></button>
-      <button class="profile-row" onclick="Sound.toggle()"><span>Sound</span><span class="chev">›</span></button>
+      <button class="profile-row" onclick="Sound.toggle()"><span>Sound</span><span class="row-state" id="soundState">On</span></button>
       <button class="profile-row" onclick="go('s-appearance')"><span>Appearance</span><span class="chev">›</span></button>
     </div>
   </section>
@@ -2631,6 +2633,8 @@ const Sound = (function(){
       b.innerHTML = ICON_SOUND;
       b.classList.toggle('muted', !on);
     });
+    const st=document.getElementById('soundState');
+    if(st){ st.textContent = on ? 'On' : 'Off'; st.classList.toggle('off', !on); }
   }
   function ding(at, vol){
     if(!ctx || !on) return;
@@ -2648,6 +2652,7 @@ const Sound = (function(){
   return {
     init(){ on = !Store.get().soundOff; paint(); },
     ensure,
+    paint,
     toggle(){
       on=!on; hapticsOn=on;
       const s=Store.get(); s.soundOff=!on; s.hapticsOff=!on; Store.set(s);
@@ -3063,6 +3068,7 @@ function renderAppearance(){
 
 function renderProfile(){
   Username.render();
+  Sound.paint();
   Daily.refresh();
   const s=Store.get();
   const cachedDaily = (s.rankByDay||{})[Daily.day];
