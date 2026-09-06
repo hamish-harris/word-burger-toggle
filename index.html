@@ -1609,7 +1609,19 @@ html:not(.light) .key.go.cold{ color:#f2e8d6; filter:none; opacity:1 }
 
 html.light .names input{background:#FFFDF7; color:#2E241A}
 
-.at-emoji svg{width:56px; height:56px}</style>
+.at-emoji svg{width:56px; height:56px}
+/* Button typography was only being set in the light theme, so dark mode
+   kept the UI font and title case. Applied to both themes here so they
+   match: Oswald, uppercase, tracked. */
+.btn{
+  font-family:var(--display); text-transform:uppercase; letter-spacing:.08em;
+}
+.seg button{
+  font-family:var(--ui); text-transform:uppercase; letter-spacing:.08em;
+  font-size:13px; font-weight:700;
+}
+.key.go{ text-transform:uppercase; letter-spacing:.08em }
+</style>
 <script>
 function systemPrefersDark(){
   try{ return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches; }catch(e){ return false; }
