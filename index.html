@@ -671,7 +671,10 @@ body::before{ content:none; display:none; }
 
 #splash.out{display:none}
 
-.sp{width:min(240px,62vw); position:relative; filter:drop-shadow(0 18px 30px rgba(0,0,0,.5)); animation:spRise .5s cubic-bezier(.2,.9,.3,1) both}
+/* The drop-shadow is offset 18px down, so it adds visible mass below the
+   burger and the shape reads slightly low even though the box is centred.
+   Nudge up so the artwork itself sits optically centred. */
+.sp{width:min(240px,62vw); position:relative; margin-top:-4px; filter:drop-shadow(0 18px 30px rgba(0,0,0,.5)); animation:spRise .5s cubic-bezier(.2,.9,.3,1) both}
 
 .sp-stack{display:flex; flex-direction:column; gap:5px}
 
