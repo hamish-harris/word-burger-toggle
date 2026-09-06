@@ -1859,7 +1859,7 @@ document.addEventListener('DOMContentLoaded', applyThemeChrome);
     <div class="countdown" id="countdown">Next burger in <b>--:--:--</b></div>
     <div class="stack" style="margin-top:auto">
       <button class="btn ghost sm" onclick="WordList.open(Store.get().today.words, 's-daily-res')">Show my words</button>
-      <button class="btn ghost sm" onclick="History.open('s-daily-res')">Past burgers</button>
+      <button class="btn ghost sm" onclick="PastBurgers.openFrom('s-daily-res','classic')">Past burgers</button>
       <button class="btn ghost sm" onclick="go('s-home')">Home</button>
     </div>
   </section>
@@ -1869,6 +1869,10 @@ document.addEventListener('DOMContentLoaded', applyThemeChrome);
     <div class="head">
       <button class="back" onclick="History.close()">‹ Back</button>
       <h2>Past burgers</h2>
+    </div>
+    <div class="seg" id="hxModeToggle" style="margin-bottom:var(--s4)">
+      <button data-hm="classic" class="on" onclick="PastBurgers.show('classic')">Classic game</button>
+      <button data-hm="target" onclick="PastBurgers.show('target')">Target game</button>
     </div>
     <div class="tiles">
       <div class="tile"><div class="n" id="hxPlayed">0</div><div class="l">played</div></div>
@@ -2022,6 +2026,10 @@ document.addEventListener('DOMContentLoaded', applyThemeChrome);
     <div class="head">
       <button class="back" onclick="go(shxReturnTo)">‹ Back</button>
       <h2>Past burgers</h2>
+    </div>
+    <div class="seg" id="shxModeToggle" style="margin-bottom:var(--s4)">
+      <button data-hm="classic" onclick="PastBurgers.show('classic')">Classic game</button>
+      <button data-hm="target" class="on" onclick="PastBurgers.show('target')">Target game</button>
     </div>
     <div class="tiles">
       <div class="tile"><div class="n" id="shxPlayed">0</div><div class="l">played</div></div>
@@ -2952,14 +2960,31 @@ const SlowHistory = (function(){
    HOME
    ============================================================ */
 
-/* Past burgers lives in the profile menu now; open whichever mode is active
-   so Target players see their own history rather than Classic's. */
+/* Past burgers lives in the profile menu now. Opens whichever mode is active
+   so Target players see their own history first, but both are always
+   reachable via the tabs at the top. */
 const PastBurgers={
+  returnTo:'s-profile',
   open(){
     let mode='classic';
     try{ mode=(Store.get().dailyMode)||'classic'; }catch(e){}
-    if(mode==='slow' && typeof SlowHistory!=='undefined'){ SlowHistory.open('s-profile'); }
-    else { History.open('s-profile'); }
+    this.returnTo='s-profile';
+    this.show(mode==='slow' ? 'target' : 'classic');
+  },
+  openFrom(returnTo, which){
+    this.returnTo=returnTo||'s-profile';
+    this.show(which||'classic');
+  },
+  show(which){
+    if(which==='target' && typeof SlowHistory!=='undefined'){
+      SlowHistory.open(this.returnTo);
+    } else {
+      History.open(this.returnTo);
+    }
+    // keep both toggles in sync so the tab state is right whichever screen shows
+    document.querySelectorAll('#hxModeToggle button, #shxModeToggle button').forEach(b=>{
+      b.classList.toggle('on', b.dataset.hm===which);
+    });
   }
 };
 
