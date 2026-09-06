@@ -800,7 +800,7 @@ body::before{ content:none; display:none; }
 
 .icon-btn:active{transform:translateY(1px)}
 
-.icon-btn.armed{background:linear-gradient(180deg,var(--ketchup-hi),var(--ketchup)); color:var(--cream); border-color:var(--ketchup); font-size:13px}
+.icon-btn.armed{background:linear-gradient(180deg,var(--ketchup-hi),var(--ketchup)); color:var(--cream); border-color:var(--ketchup); font-size:13px; white-space:nowrap}
 
 .icon-btn.muted{opacity:.42}
 
@@ -1761,7 +1761,7 @@ document.addEventListener('DOMContentLoaded', applyThemeChrome);
   <section class="screen" id="s-slow-play">
     <div class="hud">
       <div class="hud-side">
-        <button class="icon-btn" id="slowQuitBtn" onclick="SlowRound.quitTap()" aria-label="Leave - your progress is saved">‹</button>
+        <button class="icon-btn" id="slowQuitBtn" onclick="SlowRound.quitTap()" aria-label="Step away - your progress is saved">‹</button>
         <span class="who" id="slowWho">Slow Cook</span>
         <button class="finish-chip" id="slowFinishBtn" style="display:none" onclick="SlowRound.finishNow()">Finish</button>
       </div>
@@ -3707,7 +3707,7 @@ const SlowRound = (function(){
     quitTap(){
       const b=$('slowQuitBtn');
       if(!quitArmed){
-        quitArmed=true; b.classList.add('armed'); b.textContent = (st && st.source==='free') ? 'Quit?' : 'Leave?';
+        quitArmed=true; b.classList.add('armed'); b.textContent = (st && st.source==='free') ? 'Quit?' : 'Step away?';
         quitTimer=setTimeout(resetQuitS, 2400);
         return;
       }
