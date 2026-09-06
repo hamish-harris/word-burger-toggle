@@ -507,6 +507,7 @@ body.locked #app{height:100%}
   padding:12px 40px 12px 14px; outline:none;
 }
 .input-wrap{position:relative; margin-top:14px}
+#s-transfer .input-wrap{margin-top:12px}
 .in-clear{
   position:absolute; right:8px; top:50%; transform:translateY(-50%);
   width:30px; height:30px; border:none; background:none; color:var(--steel);
@@ -528,11 +529,13 @@ body.locked #app{height:100%}
 .tc-note{color:var(--steel); font-size:12px; line-height:1.5; text-align:center; margin-top:10px}
 #tcError, #tClaimError{color:var(--ketchup); font-size:12px; text-align:center; min-height:16px; margin-top:8px}
 #tClaimInput{
-  width:100%; margin-top:12px; font-family:ui-monospace,Menlo,Consolas,monospace;
+  width:100%; margin-top:0; font-family:ui-monospace,Menlo,Consolas,monospace;
   font-size:20px; letter-spacing:.12em; text-align:center; text-transform:uppercase; color:var(--cream);
   background:var(--panel); border:1px solid var(--line); border-radius:11px;
-  padding:12px 14px; outline:none;
+  /* padded both sides so the centred code stays centred with the X present */
+  padding:12px 40px; outline:none;
 }
+#tClaimInput + .in-clear{color:var(--steel)}
 #tClaimInput:focus{border-color:var(--mustard)}
 #tcCopyBtn:disabled{opacity:.45}
 html.light .tc-code, html.light #tClaimInput{background:#FFFDF7; color:#2E241A}
@@ -2145,7 +2148,10 @@ document.addEventListener('DOMContentLoaded', applyThemeChrome);
     <div class="tx-block">
       <div class="rule">Bring progress here</div>
       <p class="tx-lead">Already have a code from your other device?</p>
-      <input type="text" id="tClaimInput" maxlength="9" placeholder="XXXX-XXXX" autocomplete="off" autocapitalize="characters" spellcheck="false">
+      <div class="input-wrap">
+        <input type="text" id="tClaimInput" maxlength="9" placeholder="XXXX-XXXX" autocomplete="off" autocapitalize="characters" spellcheck="false">
+        <button type="button" class="in-clear" id="tClaimClear" onclick="Transfer.clearInput()" aria-label="Clear code" style="display:none"></button>
+      </div>
       <div id="tClaimConfirm" style="display:none">
         <p class="tc-note" id="tClaimWho"></p>
       </div>
@@ -2568,6 +2574,28 @@ const Transfer = (function(){
     Store.set(out);
   }
 
+  /* Only shown when there's something to clear. Also resets the confirm
+     step, since the input is disabled once a code has been checked - a
+     stale "Move it here" against a cleared field would be misleading. */
+  function paintClaimClear(){
+    const input=$('tClaimInput'), btn=$('tClaimClear');
+    if(!input || !btn) return;
+    btn.innerHTML = ICON_CLOSE;
+    btn.style.display = (input.value.length && !input.disabled) ? 'grid' : 'none';
+  }
+  function clearInput(){
+    const input=$('tClaimInput');
+    if(!input) return;
+    input.value='';
+    input.disabled=false;
+    pendingCode=null;
+    $('tClaimError').textContent='';
+    $('tClaimConfirm').style.display='none';
+    $('tClaimBtn').textContent='Continue';
+    paintClaimClear();
+    input.focus();
+  }
+
   function openScreen(){
     pendingCode = null;
     $('tcError').textContent='';
@@ -2579,8 +2607,15 @@ const Transfer = (function(){
     $('tClaimError').textContent='';
     $('tClaimConfirm').style.display='none';
     $('tClaimBtn').textContent='Continue';
-    $('tClaimInput').value='';
-    $('tClaimInput').disabled=false;
+    const ci=$('tClaimInput');
+    ci.value='';
+    ci.disabled=false;
+    // bound here, not at module scope - the markup doesn't exist yet then
+    if(!ci.dataset.clearBound){
+      ci.addEventListener('input', paintClaimClear);
+      ci.dataset.clearBound='1';
+    }
+    paintClaimClear();
     go('s-transfer');
   }
 
@@ -2654,6 +2689,7 @@ const Transfer = (function(){
         $('tClaimWho').textContent = 'This will move '+(data.username||'that player')+' onto this device. Anything currently on this device will be replaced.';
         $('tClaimConfirm').style.display='';
         $('tClaimInput').disabled=true;
+        paintClaimClear();
         $('tClaimBtn').textContent='Move it here';
       } else {
         const e=(data&&data.error)||'';
@@ -2707,7 +2743,7 @@ const Transfer = (function(){
     }
   }
 
-  return { openScreen, create, claimStep, copy };
+  return { openScreen, create, claimStep, copy, clearInput };
 })();
 
 const Leaderboard = (function(){
