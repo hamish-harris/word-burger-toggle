@@ -1944,6 +1944,7 @@ document.addEventListener('DOMContentLoaded', applyThemeChrome);
       <div class="howto-tierbar" style="background:var(--patty); color:#f6efe0">9+ letters<b>Patty</b></div>
     </div>
 
+    <button class="btn" id="howtoCta" onclick="exitHowto()" style="display:none">Let's eat</button>
   </section>
 
   <!-- PROFILE -->
@@ -2433,6 +2434,8 @@ let howtoReturnTo = 's-profile';
 function openHowto(returnTo){
   howtoReturnTo = returnTo || 's-profile';
   markHowto();
+  const cta = document.getElementById('howtoCta');
+  if(cta) cta.style.display = (howtoReturnTo === 's-profile') ? 'none' : '';
   go('s-howto');
 }
 function exitHowto(){
