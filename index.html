@@ -2332,6 +2332,75 @@ const Username = (function(){
 const Transfer = (function(){
   let pendingCode = null;   // code that has passed /peek and is awaiting confirm
 
+  /* Only the progress worth carrying across - not device preferences, and
+     not any round still in progress here. */
+  function localPayload(){
+    const s = Store.get();
+    const pick = {};
+    ['history','slowHistory','bestScore','slowBestScore','diamonds','slowDiamonds',
+     'played','slowPlayed','playStreak','playBestStreak','playLastDay',
+     'rankByDay','slowRankByDay'].forEach(k=>{
+      if(s[k] !== undefined) pick[k] = s[k];
+    });
+    return pick;
+  }
+
+  /* Server-side the claim moves the username and scores, but streak and
+     history live only in localStorage. Rather than the incoming device
+     silently winning, merge the two: keep every played day from both, and
+     take the better value for each running stat. */
+  function mergeLocal(incoming){
+    if(!incoming || typeof incoming!=='object') return;
+    const cur = Store.get();
+    const out = Object.assign({}, incoming, cur);
+
+    // history lists: union by day, keeping the higher-scoring entry per day
+    ['history','slowHistory'].forEach(key=>{
+      const byDay = new Map();
+      [].concat(incoming[key]||[], cur[key]||[]).forEach(h=>{
+        if(!h || typeof h.day!=='number') return;
+        const prev = byDay.get(h.day);
+        if(!prev || (h.score||0) > (prev.score||0)) byDay.set(h.day, h);
+      });
+      const merged = Array.from(byDay.values()).sort((a,b)=>a.day-b.day);
+      if(merged.length) out[key] = merged;
+    });
+
+    // bests and counters: take the higher of the two
+    ['bestScore','slowBestScore','diamonds','slowDiamonds','played','slowPlayed',
+     'playBestStreak'].forEach(k=>{
+      out[k] = Math.max(Number(incoming[k])||0, Number(cur[k])||0);
+    });
+
+    // streaks: keep the longer run, and the later "last played" day that goes with it
+    if((Number(incoming.playStreak)||0) > (Number(cur.playStreak)||0)){
+      out.playStreak = incoming.playStreak;
+      out.playLastDay = incoming.playLastDay;
+    }
+
+    // rank caches: union, preferring the better (numerically lower) rank
+    ['rankByDay','slowRankByDay'].forEach(k=>{
+      const a = incoming[k]||{}, b = cur[k]||{}, m = {};
+      Object.keys(a).concat(Object.keys(b)).forEach(day=>{
+        const va=a[day], vb=b[day];
+        m[day] = (va && vb) ? Math.min(va, vb) : (va || vb);
+      });
+      if(Object.keys(m).length) out[k] = m;
+    });
+
+    // today's in-progress rounds belong to this device, never the incoming one
+    out.today = cur.today;
+    out.slowToday = cur.slowToday;
+    out.slowInProgress = cur.slowInProgress;
+
+    // device-local preferences always stay put
+    out.soundOff = cur.soundOff;
+    out.hapticsOff = cur.hapticsOff;
+    out.dailyMode = cur.dailyMode;
+
+    Store.set(out);
+  }
+
   function close(){
     $('transferCreateModal').classList.remove('on');
     $('transferClaimModal').classList.remove('on');
@@ -2348,7 +2417,7 @@ const Transfer = (function(){
     try{
       const r = await fetch(LEADERBOARD_URL+'/transfer/create', {
         method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ deviceId: visitorId() })
+        body: JSON.stringify({ deviceId: visitorId(), payload: localPayload() })
       });
       const data = await r.json().catch(()=>null);
       if(r.ok && data && data.code){
@@ -2436,6 +2505,7 @@ const Transfer = (function(){
       const data = await r.json().catch(()=>null);
       if(r.ok && data && data.ok){
         track('transfer_claimed');
+        mergeLocal(data.payload);
         close();
         Username.init();
         if(typeof renderProfile==='function') renderProfile();
