@@ -3597,6 +3597,8 @@ function renderHome(){
   const dateLbl = new Date().toLocaleDateString(undefined,{weekday:'long', month:'short', day:'numeric'});
   // a daily round already under way - its clock is still running
   const liveRound = !!(s.dailyLive && s.dailyLive.day===Daily.day && !(s.today && s.today.day===Daily.day));
+  // a Target round started but not finished - it resumes rather than restarts
+  const slowLive = !!(s.slowInProgress && s.slowInProgress.day===SlowCook.day && !(s.slowToday && s.slowToday.day===SlowCook.day));
 
   const homeTag=$('homeTag');
   if(homeTag){
@@ -3670,8 +3672,8 @@ function renderHome(){
       ${streaks}` : `
       <div class="eyebrow">${dateLbl}</div>
       <h2>Daily Burger #${SlowCook.day+1}</h2>
-      <div class="meta">Slow cook that burger but go big or get out the kitchen.</div>
-      <button class="btn btn-play" onclick="SlowCook.play()">Play today's burger</button>
+      <div class="meta">${slowLive ? "You've got one on the go. Pick up where you left off." : 'Slow cook that burger but go big or get out the kitchen.'}</div>
+      <button class="btn btn-play" onclick="SlowCook.play()">${slowLive ? 'Keep cooking' : "Play today's burger"}</button>
       ${toggleHtml}
       ${streaks}`;
 
