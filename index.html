@@ -709,6 +709,14 @@ body::before{ content:none; display:none; }
 .home-top{padding-top:calc(var(--pad-t) + 44px)}
 
 .home-tag{margin-top:var(--s4); color:var(--cream-dim); font-size:14px; text-align:center; max-width:288px; margin-inline:auto; line-height:1.5}
+
+.moved-notice{
+  margin:var(--s4) auto 0; max-width:320px; text-align:center;
+  border:1px solid var(--line-hi); border-radius:var(--r-md);
+  padding:var(--s4); background:transparent;
+}
+.mn-title{font-family:var(--display); font-weight:700; font-size:15px; color:var(--cream)}
+.mn-body{color:var(--steel); font-size:13px; line-height:1.5; margin:6px 0 var(--s3)}
 .username-chip{
   display:block; margin:10px auto 0; padding:5px 13px; border-radius:20px;
   background:rgba(0,0,0,.22); border:1px solid var(--line-hi); color:var(--steel);
@@ -1711,6 +1719,11 @@ document.addEventListener('DOMContentLoaded', applyThemeChrome);
     <div class="home-top">
       <svg class="logo-svg wb-logo" viewBox="0 0 800 618" role="img" aria-label="Word Burger" onclick="go('s-home')" style="cursor:pointer"><use href="#wb-logo"/></svg>
       <p class="home-tag" id="homeTag">Two buns, a beginning and an end. Big words, rare words, better burgers.</p>
+      <div class="moved-notice" id="movedNotice" style="display:none">
+        <div class="mn-title">Your progress moved</div>
+        <div class="mn-body">The streak and scores from here are now on your other device. This one has started fresh.</div>
+        <button class="btn ghost sm" onclick="dismissMovedNotice()">Got it</button>
+      </div>
     </div>
 
     <div class="daily" id="dailyCard"></div>
@@ -2303,13 +2316,33 @@ function visitorId(){
 
 const Username = (function(){
   let current = null;
+  const LAST_KEY = 'wordburger.lastUsername';
+  const MOVED_KEY = 'wordburger.movedAway';
+
+  /* If the server gives this device a name it didn't have before, and it
+     wasn't the player renaming themselves, the identity was claimed by
+     another device via a transfer code. Flag it once so Home can explain
+     why the name changed and the leaderboard scores vanished. */
+  function checkMovedAway(name){
+    let prev = null;
+    try{ prev = localStorage.getItem(LAST_KEY); }catch(e){}
+    if(prev && prev !== name){
+      try{ localStorage.setItem(MOVED_KEY, '1'); }catch(e){}
+    }
+    try{ localStorage.setItem(LAST_KEY, name); }catch(e){}
+  }
+
   async function init(){
     if(!LEADERBOARD_URL) return;
     try{
       const r = await fetch(LEADERBOARD_URL+'/username?deviceId='+encodeURIComponent(visitorId()));
       if(r.ok){
         const data = await r.json();
-        if(data && data.username){ current = data.username; render(); }
+        if(data && data.username){
+          checkMovedAway(data.username);
+          current = data.username; render();
+          if(typeof renderMovedNotice==='function') renderMovedNotice();
+        }
       }
     }catch(e){}
   }
@@ -2349,6 +2382,8 @@ const Username = (function(){
       });
       const data = await r.json();
       if(data && data.ok){
+        // a rename is the player's own doing, so remember it as expected
+        try{ localStorage.setItem(LAST_KEY, data.username); }catch(e){}
         current = data.username; render(); closeModal();
       } else if(data && data.error==='taken'){
         errEl.textContent = 'That username is already taken.';
@@ -2549,6 +2584,13 @@ const Transfer = (function(){
       if(r.ok && data && data.ok){
         track('transfer_claimed');
         mergeLocal(data.payload);
+        /* This device deliberately took on the incoming name, so record it
+           as expected - otherwise the next username fetch would read it as
+           an unexplained change and show the moved-away notice here. */
+        try{
+          if(data.username) localStorage.setItem('wordburger.lastUsername', data.username);
+          localStorage.removeItem('wordburger.movedAway');
+        }catch(e){}
         pendingCode = null;
         Username.init();
         go('s-profile');
@@ -3301,7 +3343,31 @@ const PastBurgers={
   }
 };
 
+/* Shown once on a device whose identity was claimed by another device, to
+   explain why the name changed and the leaderboard scores disappeared.
+   Nothing local is deleted - this only explains. */
+function renderMovedNotice(){
+  const el = document.getElementById('movedNotice');
+  if(!el) return;
+  let moved = false;
+  try{ moved = localStorage.getItem('wordburger.movedAway') === '1'; }catch(e){}
+  el.style.display = moved ? '' : 'none';
+}
+function dismissMovedNotice(){
+  try{
+    localStorage.removeItem('wordburger.movedAway');
+    /* Also accept the new name as current. Without this the next username
+       fetch would compare against the old one again, spot the same mismatch,
+       and bring the notice straight back after a reload. */
+    const pill = document.getElementById('profilePillName');
+    if(pill && pill.textContent) localStorage.setItem('wordburger.lastUsername', pill.textContent.trim());
+  }catch(e){}
+  const el = document.getElementById('movedNotice');
+  if(el) el.style.display = 'none';
+}
+
 function renderHome(){
+  renderMovedNotice();
   Daily.refresh();
   SlowCook.refresh();
   const s=Store.get();
