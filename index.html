@@ -1334,6 +1334,14 @@ body::before{ content:none; display:none; }
   margin:var(--s4) auto 0; max-width:320px; text-align:center;
   font-size:11px; line-height:1.55; color:var(--steel); opacity:.85;
 }
+
+/* The two mode descriptions wrap to different line counts, so switching
+   Classic/Target used to shift the button and everything under it.
+   Reserving two lines keeps the card still. */
+.daily .meta{
+  min-height:2.6em;
+  display:flex; align-items:center; justify-content:center; text-align:center;
+}
 </style>
 <style id="atomic-icons">
 .at-ic{width:1.05em;height:1.05em;display:inline-block;vertical-align:-0.14em;margin-right:2px}
