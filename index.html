@@ -1780,7 +1780,7 @@ document.addEventListener('DOMContentLoaded', applyThemeChrome);
   <section class="screen" id="s-play">
     <div class="hud">
       <div class="hud-side">
-        <button class="icon-btn" id="quitBtn" onclick="Round.quitTap()" aria-label="Quit round">‹</button>
+        <button class="icon-btn" id="quitBtn" onclick="Round.quitTap()" aria-label="Exit round">‹</button>
         <span class="who" id="playWho">Daily</span>
       </div>
       <div class="hud-side">
@@ -3139,9 +3139,33 @@ const Daily = (function(){
     play(){
       const s=Store.get();
       if(s.today && s.today.day===this.day){ renderHome(); go('s-home'); return; }
+
+      /* The clock runs from the moment the letters are first shown, and keeps
+         running whether or not the game is open. Otherwise you could look at
+         the buns, leave, think of words at leisure, and come back to a fresh
+         60 seconds. */
+      const now = Date.now();
+      let live = s.dailyLive;
+      if(!live || live.day!==this.day){
+        live = { day:this.day, startedAt:now, words:[], score:0 };
+        s.dailyLive = live; Store.set(s);
+      }
+      const elapsed = (now - live.startedAt)/1000;
+      const left = 60 - elapsed;
+
+      if(left <= 0){
+        // ran out while away - bank whatever was found and show the result
+        Round.finishExpired(live, this.day, this.start, this.end);
+        return;
+      }
+
       Sound.ensure();
       track('daily_start', { puzzle:this.day+1, days_played:(Store.get().played||0) });
-      Round.begin({ mode:'daily', start:this.start, end:this.end, seconds:60, label:'Daily #'+(this.day+1) });
+      Round.begin({
+        mode:'daily', start:this.start, end:this.end,
+        seconds:60, remaining:left, resume:live,
+        label:'Daily #'+(this.day+1)
+      });
     },
     record(snap){
       const s=Store.get();
@@ -3373,6 +3397,8 @@ function renderHome(){
   const s=Store.get();
   const mode = s.dailyMode || 'classic';
   const dateLbl = new Date().toLocaleDateString(undefined,{weekday:'long', month:'short', day:'numeric'});
+  // a daily round already under way - its clock is still running
+  const liveRound = !!(s.dailyLive && s.dailyLive.day===Daily.day && !(s.today && s.today.day===Daily.day));
 
   const homeTag=$('homeTag');
   if(homeTag){
@@ -3409,8 +3435,8 @@ function renderHome(){
       ${streaks}` : `
       <div class="eyebrow">${dateLbl}</div>
       <h2>Daily Burger #${Daily.day+1}</h2>
-      <div class="meta">A minute on the grill. Fill those buns before you're out of time.</div>
-      <button class="btn btn-play" onclick="Daily.play()">Play today's burger</button>
+      <div class="meta">${liveRound ? 'Your clock is already running. Get back in there.' : "A minute on the grill. Fill those buns before you're out of time."}</div>
+      <button class="btn btn-play" onclick="Daily.play()">${liveRound ? 'Back to your burger' : "Play today's burger"}</button>
       ${toggleHtml}
       ${streaks}`;
 
@@ -3540,11 +3566,33 @@ const Round = (function(){
     quitArmed=false; clearTimeout(quitTimer);
     const b=$('quitBtn'); if(b){ b.textContent='‹'; b.classList.remove('armed'); }
   }
+  /* Keep the in-progress daily round on disk so the clock and the words
+     found survive leaving the page. Only daily rounds - free play is
+     disposable and shouldn't be resumable. */
+  function saveLive(){
+    if(!st || st.mode!=='daily') return;
+    try{
+      const s=Store.get();
+      if(s.dailyLive && s.dailyLive.day===Daily.day){
+        s.dailyLive.words = st.words.slice();
+        s.dailyLive.score = st.score;
+        Store.set(s);
+      }
+    }catch(e){}
+  }
+  function clearLive(){
+    try{
+      const s=Store.get();
+      if(s.dailyLive){ delete s.dailyLive; Store.set(s); }
+    }catch(e){}
+  }
+
   function finish(){
     clearInterval(timer);
     st.running=false;
     const snap={ day:Daily.day, score:st.score, words:st.words.slice(), start:st.start, end:st.end , rejected:(st.rejected||[]).slice() };
     if(st.mode==='daily'){
+      clearLive();
       const s=Store.get();
       track('daily_complete', {
         puzzle:snap.day+1, score:snap.score, words:snap.words.length,
@@ -3559,22 +3607,47 @@ const Round = (function(){
   }
 
   return {
+    /* The clock ran out while the player was away. Bank whatever they'd
+       found before leaving and take them straight to the result, rather
+       than letting them re-enter a round that's already over. */
+    finishExpired(live, day, start, end){
+      clearInterval(timer);
+      const words = Array.isArray(live.words) ? live.words.slice() : [];
+      const snap = { day, score: live.score||0, words, start, end, rejected: [] };
+      clearLive();
+      const s=Store.get();
+      if(!(s.today && s.today.day===day)){ Daily.record(snap); }
+      Daily.showResult();
+    },
     begin(cfg){
       st = {
         mode:cfg.mode, start:cfg.start, end:cfg.end, seconds:cfg.seconds,
         used:new Set(), words:[], score:0, running:true, warned:false, buf:'', invalid:false, rejected:[],
         total: pairTotal(cfg.start, cfg.end)
       };
+
+      /* Daily rounds survive leaving the page: restore anything already
+         found so exiting and returning doesn't hand back a clean slate. */
+      if(cfg.resume && Array.isArray(cfg.resume.words)){
+        cfg.resume.words.forEach(o=>{ st.used.add(o.w); st.words.push(o); });
+        st.score = cfg.resume.score || 0;
+      }
+
       $('playWho').textContent = cfg.label;
       $('bunTopL').textContent = st.start;
       $('bunBotL').textContent = st.end;
       $('playOrder').textContent = st.start+' → '+st.end;
-      $('playScore').innerHTML = '0 <span class="u">pts</span>';
+      $('playScore').innerHTML = st.score+' <span class="u">pts</span>';
       $('fills').innerHTML = '<div class="hint">Buns are ready. Start stacking.</div>';
       $('totalN').textContent = st.total;
-      $('foundN').textContent = '0';
+      $('foundN').textContent = String(st.words.length);
       $('progFill').style.width='0';
-      paintTimer('play', 1, clockText(st.seconds), false);
+      if(st.words.length){
+        st.words.forEach(o=>addLayer(o.w, o.pts, o.tier));
+        paintScore(); paintProgress();
+      }
+      const remaining = (typeof cfg.remaining === 'number') ? cfg.remaining : st.seconds;
+      paintTimer('play', remaining/st.seconds, clockText(Math.ceil(remaining)), false);
       seeds(); resetQuit();
 
       go('s-play');
@@ -3584,7 +3657,7 @@ const Round = (function(){
       clearInterval(timer);
       const t0=Date.now();
       timer=setInterval(()=>{
-        const left=Math.max(0, st.seconds-(Date.now()-t0)/1000);
+        const left=Math.max(0, remaining-(Date.now()-t0)/1000);
         st.left=left;
         const warnAt = st.seconds>120 ? 30 : 15;
         paintTimer('play', left/st.seconds, clockText(Math.ceil(left)), left<=warnAt);
@@ -3624,13 +3697,17 @@ const Round = (function(){
       st.score+=pts;
       addLayer(w, pts, r.tier);
       paintScore(); paintProgress();
+      saveLive();
       buzz(r.tier>=2 ? [14,36,26] : 22);
       toast('playToast', '+'+pts+(r.tier>=2?' '+RARITY[r.tier]+'!':''), true);
     },
     quitTap(){
       const b=$('quitBtn');
       if(!quitArmed){
-        quitArmed=true; b.classList.add('armed'); b.textContent='Quit?';
+        quitArmed=true; b.classList.add('armed');
+        // Daily rounds keep counting down after you leave, so "exit" is the
+        // honest word - nothing is being abandoned or reset.
+        b.textContent = (st && st.mode==='daily') ? 'Exit?' : 'Quit?';
         quitTimer=setTimeout(resetQuit, 2400);
         return;
       }
