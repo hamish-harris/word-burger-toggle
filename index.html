@@ -3397,7 +3397,7 @@ const Daily = (function(){
       $('drStreak').innerHTML = ICON_STREAK+' '+(s.playStreak||1);
       $('drBest').textContent = s.bestScore||snap.score;
       $('drDiamonds').innerHTML = ICON_DIAMOND+' '+snap.words.filter(o=>o.tier===3).length;
-      $('shareBox').textContent = Share.text(snap);
+      $('shareBox').textContent = Share.text(snap, false);
 
       const rankEl=$('drRank'), numEl=$('drRankNum');
       if(rankEl && numEl){
@@ -4009,7 +4009,7 @@ const Free = (function(){
    ============================================================ */
 const Share = (function(){
   return {
-    text(snap){
+    text(snap, withUrl){
       const tiers=[0,0,0,0];
       snap.words.forEach(o=>tiers[tierOfLen(o.w.length)]++);
       let stack='';
@@ -4021,7 +4021,8 @@ const Share = (function(){
       const gems=snap.words.filter(o=>o.tier===3).length;
       return '🍔 WORD BURGER #'+(snap.day+1)+'\n'+stack+
              snap.words.length+'/'+pairTotal(snap.start,snap.end)+' words · '+snap.score+' pts'+
-             (gems>0?' · 💎'+gems:'') + (s.streak>1?' · 🔥'+s.streak:'') + '\n'+SHARE_URL;
+             (gems>0?' · 💎'+gems:'') + (s.streak>1?' · 🔥'+s.streak:'') +
+             (withUrl===false ? '' : '\n'+SHARE_URL);
     },
     async send(){
       const snap=Store.get().today;
@@ -4184,7 +4185,7 @@ const SlowCook = (function(){
       $('srBest').textContent = s.slowBestScore||snap.score;
       $('srTime').textContent = timeText(snap.secs||0);
       $('srDiamonds').innerHTML = ICON_DIAMOND+' '+snap.words.filter(o=>o.tier===3).length;
-      $('srShareBox').textContent = SlowShare.text(snap);
+      $('srShareBox').textContent = SlowShare.text(snap, false);
 
       const srRankEl=$('srRank'), srNumEl=$('srRankNum');
       if(srRankEl && srNumEl){
@@ -4409,7 +4410,7 @@ buildKeys('slowKeys', SlowRound);
 
 const SlowShare = (function(){
   return {
-    text(snap){
+    text(snap, withUrl){
       const tiers=[0,0,0,0];
       snap.words.forEach(o=>tiers[tierOfLen(o.w.length)]++);
       let stack='';
@@ -4421,7 +4422,8 @@ const SlowShare = (function(){
       const gems=snap.words.filter(o=>o.tier===3).length;
       return '🍔 SLOW COOK #'+(snap.day+1)+'\n'+stack+
              snap.words.length+'/'+(snap.target||0)+' target · '+snap.score+' pts'+
-             (gems>0?' · 💎'+gems:'') + (s.slowStreak>1?' · 🔥'+s.slowStreak:'') + '\n'+SHARE_URL;
+             (gems>0?' · 💎'+gems:'') + (s.slowStreak>1?' · 🔥'+s.slowStreak:'') +
+             (withUrl===false ? '' : '\n'+SHARE_URL);
     },
     async send(){
       const snap=Store.get().slowToday;
