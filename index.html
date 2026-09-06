@@ -510,6 +510,26 @@ body.locked #app{height:100%}
 #usernameError{color:var(--ketchup); font-size:12px; text-align:center; min-height:16px; margin-top:8px}
 .modal-close-x{position:absolute; top:14px; right:14px; background:none; border:none; color:var(--steel); padding:4px; cursor:pointer; line-height:0}
 
+#transferCreateModal, #transferClaimModal{position:fixed; inset:0; z-index:65; display:none; align-items:center; justify-content:center; padding:24px;
+  background:rgba(10,7,4,.7); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px)}
+#transferCreateModal.on, #transferClaimModal.on{display:flex; animation:fadeIn .25s both}
+.tc-code{
+  font-family:ui-monospace,Menlo,Consolas,monospace; font-size:26px; font-weight:700;
+  letter-spacing:.14em; text-align:center; color:var(--cream);
+  background:var(--panel); border:1px dashed var(--line-hi); border-radius:12px;
+  padding:16px 10px; margin-top:14px; user-select:all;
+}
+.tc-note{color:var(--steel); font-size:12px; line-height:1.5; text-align:center; margin-top:12px}
+#tcError, #tClaimError{color:var(--ketchup); font-size:12px; text-align:center; min-height:16px; margin-top:8px}
+#tClaimInput{
+  width:100%; margin-top:14px; font-family:ui-monospace,Menlo,Consolas,monospace;
+  font-size:20px; letter-spacing:.12em; text-align:center; text-transform:uppercase; color:var(--cream);
+  background:var(--panel); border:1px solid var(--line); border-radius:11px;
+  padding:12px 14px; outline:none;
+}
+#tClaimInput:focus{border-color:var(--mustard)}
+html.light .tc-code, html.light #tClaimInput{background:#FFFDF7; color:#2E241A}
+
 
 /* ---- Aesthetic re-skin (tokens, shadows, buttons, cards) ---- */
 
@@ -1656,6 +1676,34 @@ document.addEventListener('DOMContentLoaded', applyThemeChrome);
     </div>
   </div>
 
+  <div id="transferCreateModal">
+    <div class="howto-card" style="max-width:340px; position:relative">
+      <button class="modal-close-x" onclick="Transfer.close()" aria-label="Close">×</button>
+      <h3>Move to a new device</h3>
+      <p class="lead">Enter this code on your new device to bring your name, streak and scores with you.</p>
+      <div id="tcBody">
+        <div class="tc-code" id="tcCode">····-····</div>
+        <button class="btn ghost sm" onclick="Transfer.copy()" id="tcCopyBtn" style="margin-top:12px">Copy code</button>
+        <p class="tc-note" id="tcNote">Valid for 24 hours. This device will hand over its identity once the code is used.</p>
+      </div>
+      <div id="tcError"></div>
+    </div>
+  </div>
+
+  <div id="transferClaimModal">
+    <div class="howto-card" style="max-width:340px; position:relative">
+      <button class="modal-close-x" onclick="Transfer.close()" aria-label="Close">×</button>
+      <h3>Enter your code</h3>
+      <p class="lead">Bring your name, streak and scores over from your other device.</p>
+      <input type="text" id="tClaimInput" maxlength="9" placeholder="XXXX-XXXX" autocomplete="off" autocapitalize="characters" spellcheck="false">
+      <div id="tClaimError"></div>
+      <div id="tClaimConfirm" style="display:none">
+        <p class="tc-note" id="tClaimWho"></p>
+      </div>
+      <button class="btn" onclick="Transfer.claimStep()" id="tClaimBtn" style="margin-top:14px">Continue</button>
+    </div>
+  </div>
+
   <!-- HOME -->
   <section class="screen" id="s-home">
     <div class="home-top">
@@ -1978,6 +2026,8 @@ document.addEventListener('DOMContentLoaded', applyThemeChrome);
       <button class="profile-row" onclick="openHowto('s-profile')"><span>How to play</span><span class="chev">›</span></button>
       <button class="profile-row" onclick="Sound.toggle()"><span>Sound</span><span class="row-state" id="soundState">On</span></button>
       <button class="profile-row" onclick="go('s-appearance')"><span>Appearance</span><span class="chev">›</span></button>
+      <button class="profile-row" onclick="Transfer.openCreate()"><span>Move to a new device</span><span class="chev">›</span></button>
+      <button class="profile-row" onclick="Transfer.openClaim()"><span>I have a transfer code</span><span class="chev">›</span></button>
     </div>
   </section>
 
@@ -2275,6 +2325,137 @@ const Username = (function(){
     }
   }
   return { init, openModal, closeModal, save, render };
+})();
+
+/* Device transfer: move a player's identity (username, scores, local streak
+   and history) to a new browser or phone via a short one-time code. */
+const Transfer = (function(){
+  let pendingCode = null;   // code that has passed /peek and is awaiting confirm
+
+  function close(){
+    $('transferCreateModal').classList.remove('on');
+    $('transferClaimModal').classList.remove('on');
+    pendingCode = null;
+  }
+
+  async function openCreate(){
+    const modal=$('transferCreateModal');
+    $('tcError').textContent='';
+    $('tcCode').textContent='····-····';
+    $('tcCopyBtn').textContent='Copy code';
+    modal.classList.add('on');
+    if(!LEADERBOARD_URL){ $('tcError').textContent='Not available offline.'; return; }
+    try{
+      const r = await fetch(LEADERBOARD_URL+'/transfer/create', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ deviceId: visitorId() })
+      });
+      const data = await r.json().catch(()=>null);
+      if(r.ok && data && data.code){
+        $('tcCode').textContent = data.code;
+        track('transfer_code_created');
+      } else {
+        $('tcCode').textContent='····-····';
+        $('tcError').textContent = 'Could not create a code. Try again.';
+      }
+    }catch(e){
+      $('tcError').textContent = 'Network error. Try again.';
+    }
+  }
+
+  function copy(){
+    const code = $('tcCode').textContent.trim();
+    if(!code || code.indexOf('·')>=0) return;
+    const done = ()=>{ $('tcCopyBtn').textContent='Copied'; setTimeout(()=>{ $('tcCopyBtn').textContent='Copy code'; }, 1600); };
+    try{
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(code).then(done, ()=>{});
+      } else {
+        const t=document.createElement('textarea');
+        t.value=code; document.body.appendChild(t); t.select();
+        document.execCommand('copy'); document.body.removeChild(t); done();
+      }
+    }catch(e){}
+  }
+
+  function openClaim(){
+    $('tClaimError').textContent='';
+    $('tClaimConfirm').style.display='none';
+    $('tClaimBtn').textContent='Continue';
+    $('tClaimInput').value='';
+    $('tClaimInput').disabled=false;
+    pendingCode=null;
+    $('transferClaimModal').classList.add('on');
+    setTimeout(()=>$('tClaimInput').focus(), 50);
+  }
+
+  /* Two-step on purpose: check the code and show whose identity is moving
+     before anything is overwritten, since claiming replaces this device's
+     current name and scores. */
+  async function claimStep(){
+    const errEl=$('tClaimError');
+    if(pendingCode){ return doClaim(pendingCode); }
+
+    const raw = $('tClaimInput').value.trim().toUpperCase().replace(/\s/g,'');
+    const code = raw.length===8 && raw.indexOf('-')<0 ? raw.slice(0,4)+'-'+raw.slice(4) : raw;
+    if(!code){ errEl.textContent='Enter your code.'; return; }
+    if(!LEADERBOARD_URL){ errEl.textContent='Not available offline.'; return; }
+
+    errEl.textContent='';
+    try{
+      const r = await fetch(LEADERBOARD_URL+'/transfer/peek?code='+encodeURIComponent(code));
+      const data = await r.json().catch(()=>null);
+      if(r.ok && data && data.ok){
+        pendingCode = code;
+        $('tClaimWho').textContent = 'This will move '+(data.username||'that player')+' onto this device. Anything currently on this device will be replaced.';
+        $('tClaimConfirm').style.display='';
+        $('tClaimInput').disabled=true;
+        $('tClaimBtn').textContent='Move it here';
+      } else {
+        const e=(data&&data.error)||'';
+        errEl.textContent =
+          e==='expired' ? 'That code has expired. Create a new one.' :
+          e==='used'    ? 'That code has already been used.' :
+          e==='not_found' ? "We couldn't find that code." :
+                            'Could not check that code. Try again.';
+      }
+    }catch(e){
+      errEl.textContent='Network error. Try again.';
+    }
+  }
+
+  async function doClaim(code){
+    const errEl=$('tClaimError');
+    errEl.textContent='';
+    $('tClaimBtn').textContent='Moving…';
+    try{
+      const r = await fetch(LEADERBOARD_URL+'/transfer/claim', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ deviceId: visitorId(), code })
+      });
+      const data = await r.json().catch(()=>null);
+      if(r.ok && data && data.ok){
+        track('transfer_claimed');
+        close();
+        Username.init();
+        if(typeof renderProfile==='function') renderProfile();
+        toast('playToast', 'Welcome back, '+(data.username||'')+'!', true);
+      } else {
+        const e=(data&&data.error)||'';
+        errEl.textContent =
+          e==='expired' ? 'That code expired while you were confirming.' :
+          e==='used'    ? 'That code has already been used.' :
+          e==='same_device' ? "That code was made on this device." :
+                              'Could not move it. Try again.';
+        $('tClaimBtn').textContent='Move it here';
+      }
+    }catch(e){
+      errEl.textContent='Network error. Try again.';
+      $('tClaimBtn').textContent='Move it here';
+    }
+  }
+
+  return { openCreate, openClaim, claimStep, copy, close };
 })();
 
 const Leaderboard = (function(){
