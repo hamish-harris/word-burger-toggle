@@ -1328,6 +1328,12 @@ body::before{ content:none; display:none; }
 .help-fab, .profile-pill{ top:var(--pad-t); height:32px; box-sizing:border-box }
 .help-fab{ display:grid; place-items:center; padding:0 }
 .help-fab svg{ display:block }
+
+/* quiet note at the foot of How to play */
+.howto-fineprint{
+  margin:var(--s4) auto 0; max-width:320px; text-align:center;
+  font-size:11px; line-height:1.55; color:var(--steel); opacity:.85;
+}
 </style>
 <style id="atomic-icons">
 .at-ic{width:1.05em;height:1.05em;display:inline-block;vertical-align:-0.14em;margin-right:2px}
@@ -1966,6 +1972,9 @@ document.addEventListener('DOMContentLoaded', applyThemeChrome);
     </div>
 
     <button class="btn" id="howtoCta" onclick="exitHowto()" style="display:none">Let's eat</button>
+
+    <p class="howto-fineprint">If you try a word we don't have, we make a note of the word
+    itself so we can improve the dictionary. Nothing else about you is collected.</p>
   </section>
 
   <!-- PROFILE -->
@@ -2730,6 +2739,21 @@ function clockText(t){ const m=Math.floor(t/60), s=Math.floor(t%60); return m+':
 function esc(s){ return String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 
 /* validate a submission. returns {ok, tier} or {ok:false, msg} */
+
+/* Collect the words players tried that aren't in the dictionary, so the
+   gaps can be reviewed. Sent once per round, never per keystroke. Only
+   words that fitted both buns and ran to three letters get this far. */
+function reportRejects(list, day){
+  if(typeof LEADERBOARD_URL==='undefined' || !LEADERBOARD_URL) return;
+  const words=(list||[]).filter(w=>/^[a-z]{3,50}$/.test(w)).slice(0,25);
+  if(!words.length) return;
+  try{
+    fetch(LEADERBOARD_URL+'/rejects',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({words:words, day:day|0, deviceId:visitorId()}),
+      keepalive:true}).catch(function(){});
+  }catch(e){}
+}
+
 function check(w, start, end, used){
   if(w.length < 3)                 return {ok:false, msg:'Three letters minimum.'};
   if(!/^[a-z]+$/.test(w))          return {ok:false, msg:'Letters only.'};
@@ -3080,6 +3104,8 @@ const Daily = (function(){
         snap.score>=90 ? 'Loaded stack!' :
         snap.score>=40 ? 'Nice stack' : 'On the board';
       $('drScore').textContent = snap.score;
+
+      reportRejects(snap.rejected, Daily.day);
       $('drFound').textContent = snap.words.length+'/'+pairTotal(snap.start,snap.end);
       $('drStreak').innerHTML = ICON_STREAK+' '+(s.playStreak||1);
       $('drBest').textContent = s.bestScore||snap.score;
@@ -3428,7 +3454,7 @@ const Round = (function(){
   function finish(){
     clearInterval(timer);
     st.running=false;
-    const snap={ day:Daily.day, score:st.score, words:st.words.slice(), start:st.start, end:st.end };
+    const snap={ day:Daily.day, score:st.score, words:st.words.slice(), start:st.start, end:st.end , rejected:(st.rejected||[]).slice() };
     if(st.mode==='daily'){
       const s=Store.get();
       track('daily_complete', {
@@ -3447,7 +3473,7 @@ const Round = (function(){
     begin(cfg){
       st = {
         mode:cfg.mode, start:cfg.start, end:cfg.end, seconds:cfg.seconds,
-        used:new Set(), words:[], score:0, running:true, warned:false, buf:'', invalid:false,
+        used:new Set(), words:[], score:0, running:true, warned:false, buf:'', invalid:false, rejected:[],
         total: pairTotal(cfg.start, cfg.end)
       };
       $('playWho').textContent = cfg.label;
@@ -3498,7 +3524,9 @@ const Round = (function(){
       const w=st.buf.trim().toLowerCase();
       if(!w) return;
       const r=check(w, st.start, st.end, st.used);
-      if(!r.ok){ st.invalid=true; paintBox('playBox', st.buf, st.start, st.end, st.invalid, 'Round.clear()'); shake('playEntry'); toast('playToast', r.msg); buzz([26,50,26]); return; }
+      if(!r.ok){
+        if(r.msg==='Not in the dictionary.' && st.rejected && w.length>=3 && st.rejected.indexOf(w)<0 && st.rejected.length<25) st.rejected.push(w);
+        st.invalid=true; paintBox('playBox', st.buf, st.start, st.end, st.invalid, 'Round.clear()'); shake('playEntry'); toast('playToast', r.msg); buzz([26,50,26]); return; }
       st.buf=''; st.invalid=false; paintBox('playBox', st.buf, st.start, st.end, st.invalid, 'Round.clear()');
       goHint('');
       const pts=scoreOf(w.length, r.tier);
@@ -3783,6 +3811,8 @@ const SlowCook = (function(){
         snap.score>=90 ? 'Loaded stack!' :
         snap.score>=40 ? 'Nice stack' : 'On the board';
       $('srScore').textContent = snap.score;
+
+      reportRejects(snap.rejected, SlowCook.day);
       $('srFound').textContent = snap.words.length+'/'+(snap.target||0);
       $('srStreak').innerHTML = ICON_STREAK+' '+(s.playStreak||1);
       $('srBest').textContent = s.slowBestScore||snap.score;
@@ -3874,7 +3904,7 @@ const SlowRound = (function(){
     clearInterval(timer);
     st.running=false;
     clearProgress();
-    const snap={ day:SlowCook.day, score:st.score, words:st.words.slice(), start:st.start, end:st.end, secs:Math.round(st.elapsed||0), target:st.target };
+    const snap={ day:SlowCook.day, score:st.score, words:st.words.slice(), start:st.start, end:st.end, secs:Math.round(st.elapsed||0), target:st.target , rejected:(st.rejected||[]).slice() };
     if(st.source==='free'){
       track('freeplay_target_complete', { score:snap.score, words:snap.words.length });
       Free.showTargetResult(snap);
@@ -3888,7 +3918,7 @@ const SlowRound = (function(){
     begin(cfg){
       st = {
         start:cfg.start, end:cfg.end, source:cfg.source||'daily',
-        used:new Set(), words:[], score:0, running:true, buf:'', invalid:false,
+        used:new Set(), words:[], score:0, running:true, buf:'', invalid:false, rejected:[],
         target: targetFor(cfg.start, cfg.end), elapsed:0, startedAt: Date.now()
       };
       $('slowWho').textContent = cfg.label;
@@ -3958,7 +3988,9 @@ const SlowRound = (function(){
       const w=st.buf.trim().toLowerCase();
       if(!w) return;
       const r=check(w, st.start, st.end, st.used);
-      if(!r.ok){ st.invalid=true; paintBox('slowBox', st.buf, st.start, st.end, st.invalid, 'SlowRound.clear()'); shake('slowEntry'); toast('slowToast', r.msg); buzz([26,50,26]); return; }
+      if(!r.ok){
+        if(r.msg==='Not in the dictionary.' && st.rejected && w.length>=3 && st.rejected.indexOf(w)<0 && st.rejected.length<25) st.rejected.push(w);
+        st.invalid=true; paintBox('slowBox', st.buf, st.start, st.end, st.invalid, 'SlowRound.clear()'); shake('slowEntry'); toast('slowToast', r.msg); buzz([26,50,26]); return; }
       st.buf=''; st.invalid=false; paintBox('slowBox', st.buf, st.start, st.end, st.invalid, 'SlowRound.clear()');
       goHint('');
       const pts=scoreOf(w.length, r.tier);
